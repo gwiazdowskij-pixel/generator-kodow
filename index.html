@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="pl" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — V3 (Firestore, multi‑user)</title>
+  <style>
+    :root{ color-scheme: light dark; }
+    html[data-theme="dark"]{ --bg:#0b1020; --bg-elev:#0f152a; --border:#1c2540; --muted:#9fb0c6; --text:#e9edf3; --primary:#7dd3fc; --primary-600:#38bdf8; --success:#22c55e; --danger:#f43f5e; --focus:0 0 0 3px rgba(125,211,252,.28); --radius:14px; --radius-sm:10px; --shadow:0 10px 30px rgba(0,0,0,.30), inset 0 1px rgba(255,255,255,.04); --inner:linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.02)); --input-bg:#0b1224; --chip:#0c1430; --chip-border:#203055; --table-stripe:rgba(255,255,255,.02); --header:#101937; --header-text:#d6e7ff; --glass:rgba(10,16,35,.45); --glass-border:rgba(255,255,255,.06); --modal-bg:#0a1327; --modal-border:#274077; }
+    html[data-theme="light"]{ --bg:#f6f8fc; --bg-elev:#ffffff; --border:#d9e0ee; --muted:#66789b; --text:#0f172a; --primary:#0ea5e9; --primary-600:#0284c7; --success:#16a34a; --danger:#dc2626; --focus:0 0 0 3px rgba(2,132,199,.25); --radius:14px; --radius-sm:10px; --shadow:0 10px 25px rgba(2,6,23,.08), inset 0 1px rgba(255,255,255,.6); --inner:linear-gradient(180deg, rgba(2,6,23,.02), rgba(2,6,23,.01)); --input-bg:#ffffff; --chip:#f1f5ff; --chip-border:#d9e0ee; --table-stripe:rgba(2,6,23,.03); --header:#eaf1ff; --header-text:#0f172a; --glass:rgba(255,255,255,.65); --glass-border:rgba(2,6,23,.08); --modal-bg:#ffffff; --modal-border:#d9e0ee; }
+    *{box-sizing:border-box}
+    body{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--text); background: var(--bg);}    
+    html[data-theme="dark"] body{ background: radial-gradient(1200px 700px at 8% 0%, #0c1635 0%, var(--bg) 65%), radial-gradient(1400px 900px at 100% 100%, #08122a 0%, var(--bg) 60%); }
+    header{padding:28px 20px 12px}
+    .header-inner{max-width:1280px;margin:0 auto;display:flex;gap:12px;align-items:center;justify-content:space-between}
+    .appTitle{margin:0; font-weight:800; letter-spacing:.2px}
+    .subtitle{margin:6px 0 0; color:var(--muted); font-size:13px}
+    .wrap{max-width:1280px;margin:0 auto 48px;padding:0 20px}
+    .card{background:var(--inner); border:1px solid var(--border); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .card h2{margin:0; font-size:14px; letter-spacing:.6px; text-transform:uppercase; color:var(--header-text); padding:14px 16px; border-bottom:1px solid var(--border); background:var(--header)}
+    .card .body{padding:16px}
+    label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px 2px}
+    .control{display:flex;flex-direction:column;gap:6px}
+    select,input[type=text],input[type=url],input[type=password],textarea,input[type=date]{ width:100%; padding:12px 12px; border-radius:var(--radius-sm); border:1px solid var(--border); background:var(--input-bg); color:var(--text); outline:none; transition:border-color .15s, box-shadow .15s, background .15s; font-size:14px; }
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .btn{appearance:none; border:1px solid var(--border); background:linear-gradient(180deg,#111a37,#0e152c); color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:650; transition:transform .06s, background .18s, border-color .18s; display:inline-flex; align-items:center; gap:8px; font-size:14px}
+    .btn:hover{background:linear-gradient(180deg,#132045,#0e152c); border-color:#2c3e6c}
+    .btn:active{transform:translateY(1px)}
+    .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600)); color:#071019; border-color:#0ea5e9}
+    .btn-ghost{background:transparent}
+    .toolbar{position:sticky; top:0; z-index:3; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px; margin:-8px -8px 8px; border-radius:12px; backdrop-filter: blur(8px); background:var(--glass); border:1px solid var(--glass-border)}
+    .toolbar .control{flex:1 1 200px; min-width:160px}
+    .toolbar .search{flex:2 1 280px; min-width:200px}
+    .toolbar .btn{flex:0 0 auto}
+    .toolbar .spacer{flex:1 1 auto; min-width:0}
+    .icon,.theme-icon{width:16px;height:16px;display:inline-block;vertical-align:middle}
+    dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:480px }
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    .modal-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--header)}
+    .modal-title{margin:0;font-size:14px;text-transform:uppercase;color:var(--header-text)}
+    .modal-body{padding:12px}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--border)}
+    table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
+    thead th{position:sticky; top:0; background:var(--header); color:var(--header-text); border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:.5px}
+    th,td{padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px}
+    tbody tr:nth-child(even){background:var(--table-stripe)}
+    tbody tr:hover{background:rgba(125,211,252,.07)}
+    td.right{text-align:right}
+    td:nth-child(1){min-width:120px}
+    td:nth-child(2){min-width:140px}
+    td:nth-child(3){min-width:130px}
+    td:nth-child(6){min-width:240px}
+    footer{color:var(--muted); text-align:center; padding:18px 0 36px}
+    .toast{position:fixed; bottom:16px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; transition: all .25s ease; background:var(--modal-bg); border:1px solid var(--modal-border); padding:10px 14px; border-radius:12px; box-shadow:var(--shadow); font-size:14px}
+    .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
+    html[data-theme="light"] .btn{background:linear-gradient(180deg,#ffffff,#eef3ff);color:#0f172a;border-color:#d9e0ee}
+    html[data-theme="light"] .btn:hover{background:linear-gradient(180deg,#f9fbff,#eaf1ff);border-color:#c6d2ea}
+    html[data-theme="light"] .btn-ghost{background:transparent;color:#0f172a;border-color:#d9e0ee}
+    html[data-theme="light"] .toolbar .btn{color:#0f172a}
+    html[data-theme="light"] .btn-primary{background:linear-gradient(180deg,#0ea5e9,#0284c7);color:#ffffff;border-color:#0284c7}
+    html[data-theme="light"] .btn-primary:hover{background:linear-gradient(180deg,#38bdf8,#0ea5e9)}
+    .code-box{display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--bg-elev); border:1px dashed var(--border); padding:14px 16px; border-radius:14px; font-size:14px; color:var(--text)}
+    .code-box .hint{color:var(--muted); font-size:13px}
+    #preview{font-family: inherit; font-weight:700; font-size:14px; color:var(--text)}
+    .chips{display:flex;flex-wrap:wrap;gap:8px}
+    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-elev);font-size:12px;color:var(--text)}
+    .pw{position:relative}
+    .pw input[type=password], .pw input[type=text]{padding-right:40px}
+    .pw-toggle{position:absolute; right:8px; top:50%; transform:translateY(-50%); border:0; background:transparent; cursor:pointer; padding:4px; color:var(--muted)}
+    .pw-toggle:hover{color:var(--text)}
+    .actions-right{display:flex; gap:8px; align-items:center}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <div>
+        <h1 class="appTitle">GENERATOR KODÓW <span class="brand">ESOTIQ & HENDERSON</span></h1>
+        <p class="subtitle">Szybkie nadawanie kodów: marka, asortyment, sezon i projektant</p>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center">
+        <button id="themeToggle" class="btn" type="button" title="Przełącz motyw">
+          <svg id="themeIcon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+          <span id="themeLabel">Dark</span>
+        </button>
+        <button id="authBtn" class="btn" type="button" title="Zaloguj">
+          <svg id="authIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          <span id="authLabel">Zaloguj</span>
+        </button>
+        <button id="signupBtn" class="btn btn-ghost" type="button" title="Utwórz konto">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M6 20a6 6 0 0 1 12 0"/><line x1="12" y1="14" x2="12" y2="20"/><line x1="9" y1="17" x2="15" y2="17"/></svg>
+          Utwórz konto
+        </button>
+        <button id="changePwdBtn" class="btn btn-ghost" type="button" style="display:none" title="Zmień hasło">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a4 4 0 1 0-4-4"/><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          Zmień hasło
+        </button>
+        <button id="openAdmin" class="btn btn-ghost" type="button" style="display:none" title="Panel administratora">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0A1.65 1.65 0 0 0 9 2.09V2a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82h0A1.65 1.65 0 0 0 21.91 11H22a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
+          Panel admina
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <section class="card">
+      <h2>Utwórz nowy kod</h2>
+      <div class="body">
+        <div class="row-3">
+          <div class="control">
+            <label>Marka</label>
+            <select id="brand" required>
+              <option value="BV">Bloovii (BV)</option>
+              <option value="ES" selected>Esotiq (ES)</option>
+              <option value="HE">Henderson (HE)</option>
+              <option value="HL">Henderson Ladies (HL)</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Asortyment</label>
+            <select id="assortment" required>
+              <option value="AP">APPLICATION (AP)</option>
+              <option value="BT">BUTTON (BT)</option>
+              <option value="BX">BOX (BX)</option>
+              <option value="EM">EMBROIDERY (EM)</option>
+              <option value="FAN">MISCELLANEOUS (FAN)</option>
+              <option value="HAN">HANGER PRINT (HAN)</option>
+              <option value="HG">HANGTAG (HG)</option>
+              <option value="LB">LABEL (LB)</option>
+              <option value="PC">SOCKS PACKING (PC)</option>
+              <option value="PR" selected>PRINT (PR)</option>
+              <option value="PT">PATTERN (PT)</option>
+              <option value="RB">RUBBER (RB)</option>
+              <option value="ST">PRICE STICKER (ST)</option>
+              <option value="TP">TAPE (TP)</option>
+              <option value="WCL">WASHING LABEL (WCL)</option>
+            </select>
+          </div>
+          <div class="control">
+            <label>Projektant/ka (po zalogowaniu)</label>
+            <select id="designer" disabled>
+              <option value="">— niezalogowano —</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row" style="margin-top:14px">
+          <div class="control">
+            <label>Sezon</label>
+            <select id="season" required></select>
+          </div>
+          <div class="control">
+            <label>Dane kolekcji</label>
+            <input type="text" id="collection" list="collectionsDatalist" placeholder="np. #BARBIE / LINE:SENSUAL / CAPSULE:GEO-LOGIC / GROUP:LACE TOUCH" />
+            <datalist id="collectionsDatalist"></datalist>
+          </div>
+        </div>
+
+        <div class="code-box" style="margin-top:14px">
+          <div>
+            <div class="hint">Następny dostępny kod</div>
+            <div id="preview" class="code">—</div>
+          </div>
+          <div class="actions-right">
+            <button class="btn" id="refresh" type="button">Odśwież</button>
+            <button class="btn btn-primary" id="create" type="button">Utwórz kod</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card" style="margin-top:16px">
+      <h2>Historia, filtry i statystyki</h2>
+      <div class="body">
+        <div class="toolbar" role="group" aria-label="Filtry i narzędzia listy">
+          <div class="control"><label class="sr">Marka</label><select id="filterBrand"><option value="">Marka: wszystkie</option><option value="BV">Bloovii</option><option value="ES">Esotiq</option><option value="HE">Henderson</option><option value="HL">Henderson Ladies</option></select></div>
+          <div class="control"><label class="sr">Asortyment</label><select id="filterAssort"><option value="">Asortyment: wszystkie</option><option value="AP">APPLICATION</option><option value="BT">BUTTON</option><option value="BX">BOX</option><option value="EM">EMBROIDERY</option><option value="FAN">MISCELLANEOUS</option><option value="HAN">HANGER PRINT</option><option value="HG">HANGTAG</option><option value="LB">LABEL</option><option value="PC">SOCKS PACKING</option><option value="PR">PRINT</option><option value="PT">PATTERN</option><option value="RB">RUBBER</option><option value="ST">PRICE STICKER</option><option value="TP">TAPE</option><option value="WCL">WASHING LABEL</option></select></div>
+          <div class="control"><label class="sr">Sezon</label><select id="filterSeason"><option value="">Sezon: wszystkie</option></select></div>
+          <div class="control"><label class="sr">Projektant</label><select id="filterDesigner"><option value="">Projektant: wszyscy</option></select></div>
+          <div class="control"><label class="sr">Czas</label><select id="filterDatePreset" title="Zakres czasu"><option value="">Czas: wszystkie</option><option value="today">Dziś</option><option value="yesterday">Wczoraj</option><option value="last7">Ostatni tydzień</option><option value="lastMonth">Ostatni miesiąc</option></select></div>
+          <div class="control search"><label class="sr">Szukaj</label><input id="searchText" type="text" placeholder="Szukaj w kodzie/kolekcji…" /></div>
+          <span class="spacer"></span>
+          <button class="btn" id="clearFilters" type="button">Wyczyść filtry</button>
+          <button class="btn" id="exportCsv" type="button">Eksport CSV</button>
+          <button class="btn" id="exportXlsx" type="button" title="Eksport do Excela (.xls)">Eksport XLS</button>
+          <button class="btn" id="quickMine" type="button" title="Filtruj moje (wymaga zalogowania)">Moje</button>
+        </div>
+        <div id="stats" style="margin:8px -8px 0; padding:0 8px" class="chips"></div>
+        <div class="body" style="max-height: 520px; overflow: auto; margin:-8px; border-radius: 12px">
+          <table id="logTable">
+            <thead>
+              <tr>
+                <th>Kod</th><th>Asortyment</th><th>Marka</th><th>Sezon</th><th>Projektant</th><th>Kolekcja</th><th>Data</th><th class="right">Akcje</th>
+              </tr>
+            </thead>
+            <tbody id="logBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>© ESOTIQ & HENDERSON S.A.</footer>
+  <div id="toast" class="toast" role="status" aria-live="polite">Skopiowano kod do schowka</div>
+
+  <!-- MODALS: Login / Sign Up / Set Password / Admin Panel / Change Password -->
+  <dialog id="loginDialog"><div class="modal-header"><h3 class="modal-title">Logowanie</h3><button class="btn btn-ghost" type="button" data-close>Zamknij</button></div><div class="modal-body"><div class="control"><label>Nazwa użytkownika</label><input id="loginUserName" type="text" maxlength="20" placeholder="np. ania-k" /></div><div class="control" style="margin-top:8px"><label>Hasło</label><div class="pw"><input id="loginPass" type="password" placeholder="Wpisz hasło" /><button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div id="loginError" class="hint" style="color:#fca5a5; display:none; margin-top:6px">Błędne dane logowania.</div></div><div class="modal-actions"><button class="btn" type="button" data-close>Anuluj</button><button id="loginSubmit" class="btn btn-primary" type="button">Zaloguj</button></div></dialog>
+
+  <dialog id="signupDialog"><div class="modal-header"><h3 class="modal-title">Utwórz konto</h3></div><div class="modal-body"><div class="row"><div class="control"><label>Nazwa użytkownika (litery/cyfry/myślnik, max 20)</label><input id="suUsername" type="text" maxlength="20" placeholder="np. ania-k" /></div><div class="control"><label>Imię (max 20)</label><input id="suFirst" type="text" maxlength="20" placeholder="np. Ania" /></div></div><div class="row" style="margin-top:8px"><div class="control"><label>Nazwisko (max 20)</label><input id="suLast" type="text" maxlength="20" placeholder="np. Kowalska" /></div><div class="control" style="align-self:end"><button id="suNext" class="btn btn-primary" type="button" style="width:100%">Dalej</button></div></div><div id="suError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div></div><div class="modal-actions"><button class="btn" type="button" data-close>Anuluj</button></div></dialog>
+
+  <dialog id="setPwdDialog"><div class="modal-header"><h3 class="modal-title">Ustaw hasło</h3></div><div class="modal-body"><p class="hint">Hasło: do 16 znaków. Ikonka oka — podgląd.</p><div class="control"><label>Hasło</label><div class="pw"><input id="newPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div class="control"><label>Powtórz hasło</label><div class="pw"><input id="newPwd2" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div id="setPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px">Hasła muszą być identyczne.</div></div><div class="modal-actions"><button class="btn" type="button" data-close>Anuluj</button><button id="setPwdSave" class="btn btn-primary" type="button">Zapisz</button></div></dialog>
+
+  <dialog id="adminDialog"><div class="modal-header"><h3 class="modal-title">Panel administratora</h3><button class="btn btn-ghost" type="button" data-close>Zamknij</button></div><div class="modal-body"><p class="hint">Reset przywraca hasło do wartości pustej i wymusza ustawienie nowego przy następnym logowaniu.</p><div id="adminList" class="chips" style="margin-top:8px"></div></div><div class="modal-actions"><button class="btn" type="button" data-close>Zamknij</button></div></dialog>
+
+  <dialog id="changePwdDialog"><div class="modal-header"><h3 class="modal-title">Zmień hasło</h3><button class="btn btn-ghost" type="button" data-close>Zamknij</button></div><div class="modal-body"><div class="control"><label>Obecne hasło</label><div class="pw"><input id="oldPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="oldPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div class="control"><label>Nowe hasło</label><div class="pw"><input id="chgNewPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="chgNewPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div class="control"><label>Powtórz hasło</label><div class="pw"><input id="chgNewPwd2" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="chgNewPwd2" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div><div id="chgPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div></div><div class="modal-actions"><button class="btn" type="button" data-close>Anuluj</button><button id="chgPwdSave" class="btn btn-primary" type="button">Zapisz</button></div></dialog>
+
+  <!-- Firebase SDK (modular) -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+    import { getFirestore, doc, getDoc, setDoc, updateDoc, runTransaction, collection, addDoc, getDocs, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore.js';
+
+    // ====== KONFIGURACJA FIREBASE ======
+    const firebaseConfig = {
+      apiKey: "WSTAW_API_KEY",
+      authDomain: "WSTAW_AUTH_DOMAIN",
+      projectId: "WSTAW_PROJECT_ID",
+      storageBucket: "WSTAW_BUCKET",
+      messagingSenderId: "WSTAW_SENDER_ID",
+      appId: "WSTAW_APP_ID"
+    };
+    // Po wypełnieniu powyżej możesz hostować na GitHub Pages
+
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
+
+    // ====== NARZĘDZIA UI ======
+    const $ = (id) => document.getElementById(id);
+    const on = (el, ev, fn) => { if(el) el.addEventListener(ev, fn); };
+
+    // THEME
+    const themeToggle = $('themeToggle');
+    const themeLabel = $('themeLabel');
+    const themeIcon = $('themeIcon');
+    const savedTheme = localStorage.getItem('halina_theme');
+    function setThemeIcon(theme){ if(!themeIcon) return; themeIcon.innerHTML = theme==='dark'
+      ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+      : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    }
+    (function(){ const t = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.setAttribute('data-theme', t); setThemeIcon(t); if(themeLabel) themeLabel.textContent = t==='dark' ? 'Dark' : 'Light'; localStorage.setItem('halina_theme', t); })();
+    on(themeToggle, 'click', ()=>{ const cur = document.documentElement.getAttribute('data-theme'); const next = cur==='dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('halina_theme', next); setThemeIcon(next); if(themeLabel) themeLabel.textContent = next==='dark' ? 'Dark' : 'Light'; });
+
+    // ====== BIZNES/STATE ======
+    let auth = { user:'', role:'' }; // role: 'admin'|'user'|''
+    const brandEl=$('brand'), assortmentEl=$('assortment'), seasonEl=$('season'), collectionEl=$('collection'), previewEl=$('preview');
+    const logBody=$('logBody'), statsEl=$('stats');
+    const filterBrand=$('filterBrand'), filterAssort=$('filterAssort'), filterSeason=$('filterSeason'), filterDesigner=$('filterDesigner'), searchText=$('searchText');
+    const authBtn=$('authBtn'), authLabel=$('authLabel'), authIcon=$('authIcon');
+    const openAdminBtn=$('openAdmin'), changePwdBtn=$('changePwdBtn'), signupBtn=$('signupBtn');
+    const designerEl=$('designer');
+
+    const pad3 = n => String(n).padStart(3,'0');
+    const BRAND_MAP = { ES:'Esotiq', HE:'Henderson', BV:'Bloovii', HL:'Henderson Ladies' };
+    const ASSORTMENT_MAP = { PR:'PRINT', PT:'PATTERN', EM:'EMBROIDERY', RB:'RUBBER', TP:'TAPE', AP:'APPLICATION', LB:'LABEL', HG:'HANGTAG', BX:'BOX', PC:'SOCKS PACKING', ST:'PRICE STICKER', FAN:'MISCELLANEOUS', BT:'BUTTON', HAN:'HANGER PRINT', WCL:'WASHING LABEL' };
+
+    // ====== HASH HASEŁ (w przeglądarce) ======
+    async function sha256(str){ const buf=new TextEncoder().encode(str); const hash=await crypto.subtle.digest('SHA-256', buf); return [...new Uint8Array(hash)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+    // ====== USERS (Firestore) ======
+    const colUsers = collection(db,'users'); // docId = username (lowercase)
+    const colCounters = collection(db,'counters');
+    const colLog = collection(db,'log');
+
+    function updateAuthButtonUI(){ const logged = !!auth.user; if(logged){ authLabel.textContent='Wyloguj'; authBtn.title='Wyloguj'; authIcon.innerHTML='<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'; changePwdBtn.style.display = (auth.role==='user') ? 'inline-flex' : 'none'; openAdminBtn.style.display = (auth.role==='admin') ? 'inline-flex' : 'none'; if(designerEl){ designerEl.innerHTML=`<option value="${auth.user}">${auth.user}</option>`; designerEl.disabled=true; } } else { authLabel.textContent='Zaloguj'; authBtn.title='Zaloguj'; authIcon.innerHTML='<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>'; changePwdBtn.style.display='none'; openAdminBtn.style.display='none'; if(designerEl){ designerEl.innerHTML='<option value="">— niezalogowano —</option>'; designerEl.disabled=true; } }
+    }
+    function setLoggedIn(username, role){ auth={ user:username, role }; updateAuthButtonUI(); showToast(`Zalogowano: ${username}${role==='admin'?' (admin)':''}`); }
+    function setLoggedOut(){ auth={ user:'', role:'' }; updateAuthButtonUI(); showToast('Wylogowano'); }
+
+    async function getUserDoc(username){ const id = username.trim().toLowerCase(); return await getDoc(doc(db,'users', id)); }
+
+    async function signup(username, first, last){ const id=username.toLowerCase(); const ref=doc(db,'users', id); const snap=await getDoc(ref); if(snap.exists()) return {ok:false, error:'USERNAME_TAKEN'}; // prosty check imię+nazwisko
+      // sprawdź duplikat name+last
+      const all = await getDocs(colUsers); const nameTaken = all.docs.some(d=> (d.data().first||'')===first && (d.data().last||'')===last);
+      if(nameTaken) return {ok:false, error:'NAME_TAKEN'};
+      await setDoc(ref, { first, last, pass:'', role:(id==='administrator'?'admin':'user') });
+      return {ok:true}; }
+
+    async function setPassword(username, newPass){ const id=username.toLowerCase(); const ref=doc(db,'users', id); const snap=await getDoc(ref); if(!snap.exists()) return {ok:false, error:'NO_USER'}; await updateDoc(ref, { pass: await sha256(newPass||'') }); return {ok:true}; }
+
+    async function tryLogin(username, pass){ const id=username.toLowerCase(); const ref=doc(db,'users', id); const snap=await getDoc(ref); if(!snap.exists()) return {ok:false}; const data=snap.data(); const stored = data.pass||''; if(!stored){ // wymuś ustawienie hasła
+        setLoggedIn(id, data.role||'user'); openModal($('setPwdDialog')); $('setPwdDialog').dataset.pendingUser=id; return {ok:true, needPwd:true}; }
+      const given = await sha256(pass||''); if(stored===given){ setLoggedIn(id, data.role||'user'); return {ok:true}; } return {ok:false}; }
+
+    async function listDesigners(){ const res=await getDocs(colUsers); return res.docs.filter(d=> d.id!=='administrator').map(d=>({ username:d.id, first:d.data().first||'', last:d.data().last||'' })); }
+
+    // ====== CODES (transaction counter) ======
+    function keyFor(a,b){ return `${a}_${b}` }
+
+    async function nextCode(assort, brand){ const key = keyFor(assort, brand); const ref = doc(db,'counters', key); const snap = await getDoc(ref); const seq = (snap.exists()? (Number(snap.data().seq)||0) : 0) + 1; return `${assort}_${brand}${pad3(seq)}`; }
+
+    async function createCode({assortment, brand, season, collection, username}){
+      const key = keyFor(assortment, brand);
+      const counterRef = doc(db,'counters', key);
+      const userRef = doc(db,'users', username.toLowerCase());
+      const userSnap = await getDoc(userRef); if(!userSnap.exists()) throw new Error('NO_USER');
+      const u = userSnap.data(); const displayName = `${u.first||''} ${u.last||''}`.trim();
+      let resultCode = '';
+      await runTransaction(db, async (tx)=>{
+        const ctr = await tx.get(counterRef);
+        const current = ctr.exists()? (Number(ctr.data().seq)||0) : 0;
+        const next = current + 1;
+        const code = `${assortment}_${brand}${pad3(next)}`;
+        // update counter
+        if(ctr.exists()) tx.update(counterRef, {seq: next}); else tx.set(counterRef, {seq: next});
+        // add log row
+        await tx.set(doc(colLog), { code, assortment, brand, season, collection: collection||'', user: username, name: displayName, createdAt: new Date().toISOString() });
+        resultCode = code;
+      });
+      return resultCode;
+    }
+
+    // ====== LOG (load & render) ======
+    let logCache = [];
+    async function loadLog(){ const qy = query(colLog, orderBy('createdAt')); const snap = await getDocs(qy); logCache = snap.docs.map(d=> d.data()); renderLog(); }
+
+    function renderStats(rows){ if(!statsEl) return; const byDesigner={}, bySeason={}, byAssort={}; rows.forEach(r=>{ byDesigner[r.name]=(byDesigner[r.name]||0)+1; bySeason[r.season]=(bySeason[r.season]||0)+1; byAssort[r.assortment]=(byAssort[r.assortment]||0)+1; }); const chip=(k,v)=>`<span class=\"chip\"><strong>${k}:</strong> ${v}</span>`; const toBlock=(obj,label)=> Object.keys(obj).sort((a,b)=>a.localeCompare(b,'pl')).map(k=>chip(label==='ASSORT'?(ASSORTMENT_MAP[k]||k):k, obj[k])).join(''); statsEl.innerHTML=`${chip('Widoczne', rows.length)} ${toBlock(byDesigner)} ${toBlock(bySeason)} ${toBlock(byAssort,'ASSORT')}`; }
+
+    function visibleRows(){ const t=(searchText?.value||'').toLowerCase(); const preset=$('filterDatePreset')?.value||''; let fromTS=null,toTS=null; if(preset){ const now=new Date(); const start=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate()).getTime(); const end=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate(),23,59,59,999).getTime(); if(preset==='today'){ fromTS=start(now); toTS=end(now);} else if(preset==='yesterday'){ const y=new Date(now.getTime()-86400000); fromTS=start(y); toTS=end(y);} else if(preset==='last7'){ const s=new Date(now.getTime()-6*86400000); fromTS=start(s); toTS=end(now);} else if(preset==='lastMonth'){ const m=new Date(now); m.setMonth(m.getMonth()-1); fromTS=start(m); toTS=end(now);} }
+      return logCache.filter(e=>{ if(filterBrand.value && e.brand!==filterBrand.value) return false; if(filterAssort.value && e.assortment!==filterAssort.value) return false; if(filterSeason.value && e.season!==filterSeason.value) return false; if(filterDesigner.value && e.name!==filterDesigner.value) return false; if(fromTS!==null){ const ts=new Date(e.createdAt).getTime(); if(!(ts>=fromTS && ts<=toTS)) return false; } if(t){ const hay=`${e.code} ${e.collection} ${e.name}`.toLowerCase(); if(!hay.includes(t)) return false; } return true; }); }
+
+    function renderLog(){ if(!logBody) return; const rows=visibleRows(); logBody.innerHTML=''; rows.slice().reverse().forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML=`<td><strong>${item.code}</strong></td><td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td><td>${BRAND_MAP[item.brand]||item.brand}</td><td>${item.season}</td><td>${item.name||''}</td><td>${item.collection||''}</td><td class=\"hint\">${new Date(item.createdAt).toLocaleString()}</td><td class=\"right\"><button class=\"btn\" data-action=\"copy\" data-code=\"${item.code}\">Kopiuj</button></td>`; logBody.appendChild(tr); }); renderStats(rows); }
+
+    function showToast(msg){ const t=$('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(showToast._tid); showToast._tid=setTimeout(()=>t.classList.remove('show'),1600); }
+
+    // ====== SEASONS / UI BINDINGS ======
+    function buildSeasons(){ const now=new Date(), y=now.getFullYear(); const years=[y,y+1,y+2]; const opts=[]; years.forEach(yr=>{ opts.push(`SS${yr}`); opts.push(`AW${yr}`); }); seasonEl.innerHTML=opts.map(s=>`<option>${s}</option>`).join(''); filterSeason.innerHTML='<option value="">Sezon: wszystkie</option>'+opts.map(s=>`<option value="${s}">${s}</option>`).join(''); seasonEl.value=(now.getMonth()>=8)?`AW${y}`:`SS${y}`; }
+
+    async function rebuildDesignerFilter(){ const list = await listDesigners(); const cur=filterDesigner.value; const names = list.map(d=> `${d.first} ${d.last}`.trim()).filter(Boolean).sort((a,b)=> a.localeCompare(b,'pl')); filterDesigner.innerHTML='<option value="">Projektant: wszyscy</option>'+names.map(n=>`<option value="${n}">${n}</option>`).join(''); if(names.includes(cur)) filterDesigner.value=cur; }
+
+    async function refreshPreview(){ const a=assortmentEl.value, b=brandEl.value; const code = await nextCode(a,b); previewEl.textContent = code || '—'; }
+
+    async function addEntry(){ if(!auth.user || auth.role==='admin'){ alert('Zaloguj się jako projektant/ka.'); return; } const brand=brandEl.value, assortment=assortmentEl.value, season=seasonEl.value, collection=(collectionEl.value||'').trim(); try{ const code = await createCode({assortment, brand, season, collection, username: auth.user}); await loadLog(); await refreshPreview(); buildCollectionDatalist(); showToast('Nowy kod: '+code); navigator.clipboard?.writeText(code).catch(()=>{}); } catch(e){ alert('Błąd tworzenia kodu'); } }
+
+    function exportCSV(){ const sep=';'; const header=['code','assortment','brand','season','designer','collection','created_at']; const rows=logCache.map(e=>[e.code,e.assortment,e.brand,e.season,e.name||'',e.collection||'',e.createdAt]); const esc=v=>{const s=String(v??''); return /[";\n]/.test(s)?'"'+s.replaceAll('"','""')+'"':s}; const csv=[header.join(sep), ...rows.map(r=>r.map(esc).join(sep))].join('\n'); const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='halina_codes_export.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+    function exportXLS(){ const escXml=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); const header=['code','assortment','brand','season','designer','collection','created_at']; const rows=logCache.map(e=>[e.code,e.assortment,e.brand,e.season,e.name||'',e.collection||'',e.createdAt]); const row=arr=>'<Row>'+arr.map(v=>`<Cell><Data ss:Type="String">${escXml(v)}</Data></Cell>`).join('')+'</Row>'; const xml=`<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?>\
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">\
+<Worksheet ss:Name="codes"><Table>\
+${row(header)}\
+${rows.map(row).join('')}\
+</Table></Worksheet></Workbook>`; const blob=new Blob([xml],{type:'application/vnd.ms-excel'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='halina_codes_export.xls'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
+
+    function buildCollectionDatalist(){ const dl=$('collectionsDatalist'); if(!dl) return; const map={}; logCache.forEach(e=>{ const c=(e.collection||'').trim(); if(c){ map[c]=(map[c]||0)+1; } }); dl.innerHTML=Object.entries(map).sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0],'pl')).map(([n])=>`<option value="${n}">`).join(''); }
+
+    function openModal(dlg){ dlg && dlg.showModal && dlg.showModal(); }
+    function closeModal(dlg){ dlg && dlg.close && dlg.close(); }
+    document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> closeModal(e.target.closest('dialog'))));
+
+    // ====== AUTH UI ======
+    const loginDialog=$('loginDialog'), loginUserName=$('loginUserName'), loginPass=$('loginPass'), loginError=$('loginError');
+    const signupDialog=$('signupDialog'), suUsername=$('suUsername'), suFirst=$('suFirst'), suLast=$('suLast'), suError=$('suError');
+    const setPwdDialog=$('setPwdDialog'), newPwd=$('newPwd'), newPwd2=$('newPwd2'), setPwdError=$('setPwdError');
+
+    const reUsername = /^[A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż-]{1,20}$/; // z myślnikiem
+    const reName = /^[A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż]{1,20}$/;
+
+    on($('loginSubmit'),'click', async ()=>{ loginError.style.display='none'; const u=(loginUserName.value||'').trim(); const p=loginPass.value||''; const res=await tryLogin(u,p); if(!res.ok){ loginError.style.display='block'; return; } closeModal(loginDialog); });
+    on(authBtn,'click', ()=>{ if(auth.user){ setLoggedOut(); } else { loginError.style.display='none'; loginUserName.value=''; loginPass.value=''; openModal(loginDialog);} });
+    on(signupBtn,'click', ()=>{ suUsername.value=''; suFirst.value=''; suLast.value=''; suError.style.display='none'; openModal(signupDialog); });
+
+    on($('suNext'),'click', async ()=>{ suError.style.display='none'; const u=suUsername.value.trim(); const f=suFirst.value.trim(); const l=suLast.value.trim(); if(!u||!f||!l){ suError.textContent='Wypełnij wszystkie pola.'; suError.style.display='block'; return; } if(!reUsername.test(u)){ suError.textContent='Nazwa użytkownika: litery/cyfry/myślnik, max 20 znaków.'; suError.style.display='block'; return; } if(!reName.test(f)||!reName.test(l)){ suError.textContent='Imię i nazwisko: tylko litery/cyfry, max 20 znaków.'; suError.style.display='block'; return; } const r=await signup(u,f,l); if(!r.ok){ suError.textContent = r.error==='USERNAME_TAKEN' ? 'Nazwa użytkownika istnieje.' : 'IMIĘ I NAZWISKO JUŻ ISTNIEJĄ.'; suError.style.display='block'; return; } setPwdDialog.dataset.pendingUser = u.toLowerCase(); newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; closeModal(signupDialog); openModal(setPwdDialog); });
+
+    on($('setPwdSave'),'click', async ()=>{ const u = setPwdDialog.dataset.pendingUser || auth.user; const p1=newPwd.value||''; const p2=newPwd2.value||''; if(p1!==p2){ setPwdError.style.display='block'; return; } if(!u){ closeModal(setPwdDialog); return; } const ok = await setPassword(u,p1); if(!ok.ok){ setPwdError.style.display='block'; return; } // auto-login
+      const relog = await tryLogin(u, p1); if(relog.ok){ closeModal(setPwdDialog); showToast('Hasło zapisane. Zalogowano.'); } });
+
+    on(changePwdBtn,'click', ()=>{ if(!auth.user || auth.role!=='user') return; $('chgPwdError').style.display='none'; $('oldPwd').value=''; $('chgNewPwd').value=''; $('chgNewPwd2').value=''; openModal($('changePwdDialog')); });
+    on($('chgPwdSave'),'click', async ()=>{ if(!auth.user) return; const rec = await getUserDoc(auth.user); if(!rec.exists()) return; const data=rec.data(); const oldp=$('oldPwd').value||''; const p1=$('chgNewPwd').value||''; const p2=$('chgNewPwd2').value||''; if(data.pass && (await sha256(oldp))!==data.pass){ $('chgPwdError').textContent='Błędne obecne hasło.'; $('chgPwdError').style.display='block'; return; } if(p1!==p2){ $('chgPwdError').textContent='Hasła muszą być identyczne.'; $('chgPwdError').style.display='block'; return; } await setPassword(auth.user,p1); closeModal($('changePwdDialog')); showToast('Hasło zmienione.'); });
+
+    // Admin panel
+    function buildAdminList(){ getDocs(colUsers).then(snap=>{ const list = snap.docs.filter(d=> d.id!=='administrator').map(d=>({ id:d.id, ...d.data() })); const wrap=$('adminList'); wrap.innerHTML = list.map(u=>`<span class=\"chip\"><strong>${u.first} ${u.last}</strong> <em>@${u.id}</em> <button class=\"btn\" data-reset=\"${u.id}\">Reset</button></span>`).join(''); }); }
+    on(openAdminBtn,'click', ()=>{ if(auth.role!=='admin') return; buildAdminList(); openModal($('adminDialog')); });
+    on($('adminList'),'click', async (e)=>{ const btn=e.target.closest('button[data-reset]'); if(!btn) return; const u=btn.getAttribute('data-reset'); if(confirm(`Zresetować hasło użytkownika @${u}?`)){ await setPassword(u,''); showToast('Hasło zresetowane.'); } });
+
+    // Bindings
+    function buildUI(){ [brandEl,assortmentEl].forEach(el=> on(el,'change', refreshPreview)); on($('refresh'),'click', refreshPreview); on($('create'),'click', addEntry); on($('exportCsv'),'click', exportCSV); on($('exportXlsx'),'click', exportXLS); on(filterBrand,'change', renderLog); on(filterAssort,'change', renderLog); on(filterSeason,'change', renderLog); on(filterDesigner,'change', renderLog); on($('filterDatePreset'),'change', renderLog); on(searchText,'input', renderLog); on($('clearFilters'),'click', ()=>{ filterBrand.value=''; filterAssort.value=''; filterSeason.value=''; filterDesigner.value=''; $('filterDatePreset').value=''; searchText.value=''; renderLog(); }); }
+
+    function buildCollectionDatalistInit(){ buildCollectionDatalist(); }
+
+    // INIT
+    function buildSeasonsInit(){ buildSeasons(); }
+    async function init(){ buildSeasonsInit(); buildUI(); await rebuildDesignerFilter(); await loadLog(); await refreshPreview(); buildCollectionDatalistInit(); updateAuthButtonUI(); }
+    init();
+
+    // Eye toggles
+    document.addEventListener('click', (e)=>{ const btn=e.target.closest('.pw-toggle'); if(!btn) return; const id=btn.getAttribute('data-target'); const inp=$(id); if(!inp) return; inp.type = (inp.type==='password'?'text':'password'); });
+
+    // Copy via delegation
+    document.addEventListener('click', (e)=>{ const b=e.target.closest('button'); if(!b) return; if(b.dataset.action==='copy'){ const code=b.dataset.code; navigator.clipboard?.writeText(code).then(()=>{ b.textContent='Skopiowano'; setTimeout(()=>b.textContent='Kopiuj',1200); showToast('Skopiowano: '+code); }); } });
+
+  </script>
+
+  <script>
+    function showToast(msg){ const t=document.getElementById('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(showToast._tid); showToast._tid=setTimeout(()=>t.classList.remove('show'),1600); }
+  </script>
+</body>
+</html>
