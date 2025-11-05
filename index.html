@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore)</title>
+  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore realtime)</title>
 
   <!-- WSTRZYKNIĘTE: Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
   <script>
@@ -77,18 +77,6 @@
     .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600)); color:#071019; border-color:#0ea5e9}
     .btn-ghost{background:transparent}
 
-    .toolbar{position:sticky; top:0; z-index:3; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px; margin:-8px -8px 8px; border-radius:12px; backdrop-filter: blur(8px); background:var(--glass); border:1px solid var(--glass-border)}
-
-    .icon,.theme-icon{width:16px;height:16px;display:inline-block;vertical-align:middle}
-
-    dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:460px }
-    dialog::backdrop{background:rgba(0,0,0,.45)}
-    dialog[open]{ display:block; }
-    .modal-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--header)}
-    .modal-title{margin:0;font-size:14px;text-transform:uppercase;color:var(--header-text)}
-    .modal-body{padding:12px}
-    .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--border)}
-
     table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
     thead th{position:sticky; top:0; background:var(--header); color:var(--header-text); border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:.5px}
     th,td{padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px}
@@ -110,7 +98,7 @@
     <div class="header-inner">
       <div>
         <h1 class="appTitle">GENERATOR KODÓW <span class="brand">ESOTIQ & HENDERSON</span></h1>
-        <p class="subtitle">Współdzielone online (Firestore, realtime) — TEST MODE włączony</p>
+        <p class="subtitle">Współdzielone online (Firestore, realtime) — trwałe logowanie</p>
       </div>
       <div style="display:flex; gap:8px; align-items:center">
         <span id="envBadge" class="badge">ENV: …</span>
@@ -267,7 +255,8 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc,
-      collection, addDoc, query, orderBy, onSnapshot, runTransaction
+      collection, addDoc, query, orderBy, onSnapshot, runTransaction,
+      serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
     // ===== DOM =====
@@ -284,12 +273,18 @@
     const sha256Hex = async (text)=>{ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); };
     const showToast = (m)=>{ if(!toast) return; toast.textContent = m; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'),1600); };
 
+    // ===== PERSIST AUTH (trwałe logowanie) =====
+    const AUTH_KEY = 'gh_auth_v1';
+    const loadAuth = ()=>{ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)) || {user:'',role:''}; }catch{ return {user:'',role:''}; } };
+    const saveAuth = (auth)=>{ localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); };
+    let AUTH = loadAuth(); // wczytaj zapisany stan
+
     // ===== Konfiguracja i inicjalizacja Firebase =====
     const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
     const app = initializeApp(firebaseConfig);
     const db  = getFirestore(app);
 
-    envBadge.textContent = 'ENV: FIREBASE (online, współdzielone — TEST MODE)';
+    envBadge.textContent = 'ENV: FIREBASE (online, współdzielone — realtime)';
 
     // ===== MAPPINGI =====
     const BRAND_MAP = { ES:'Esotiq', HE:'Henderson', BV:'Bloovii', HL:'Henderson Ladies' };
@@ -300,9 +295,7 @@
     const codesCol = collection(db, 'codes');
     const countersDoc = doc(db, 'meta', 'counters');
 
-    // ===== AUTH (test mode) =====
-    let AUTH = { user:'', role:'' };
-
+    // ===== UI AUTH =====
     function updateAuthUI(){
       const logged = !!AUTH.user;
       authLabel.textContent = logged ? 'Wyloguj' : 'Zaloguj';
@@ -323,37 +316,49 @@
       onSnapshot(qUsers, snap=>{
         const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
         loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
-        // auto-seed (TEST MODE): jeśli nie ma podstawowych userów, dopisz ich jednorazowo
+
+        // Seed (tylko jeśli pusto) — wygodne przy pierwszym uruchomieniu
         if (arr.length === 0) {
           (async ()=>{
             const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
             for (const u of seed) {
-              await setDoc(doc(db,'users',u), { id:u, first:'', last:'', pass:'', forceReset:true, role:'user', createdAt: Date.now() });
+              await setDoc(doc(db,'users',u), { id:u, first:'', last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
             }
-            await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: Date.now() });
+            await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: serverTimestamp() });
           })().catch(console.error);
         }
-      });
+      }, err => console.error('users onSnapshot error', err));
     }
 
     // ===== Realtime: Codes =====
+    function toJsDate(ts){
+      if (!ts) return new Date();
+      // Firestore Timestamp ma met. toDate()
+      if (typeof ts.toDate === 'function') return ts.toDate();
+      // fallback dla liczb/ISO:
+      if (typeof ts === 'number') return new Date(ts);
+      if (typeof ts === 'string') return new Date(ts);
+      return new Date();
+    }
+
     function subscribeCodes(){
-      const qCodes = query(codesCol, orderBy('createdAt'));
+      const qCodes = query(codesCol, orderBy('createdAt', 'asc'));
       onSnapshot(qCodes, snap=>{
         const arr = snap.docs.map(d=> d.data());
         logBody.innerHTML='';
         arr.slice().reverse().forEach(item=>{
           const tr=document.createElement('tr');
+          const dt = toJsDate(item.createdAt);
           tr.innerHTML = `<td><strong>${item.code}</strong></td>
             <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
             <td>${BRAND_MAP[item.brand]||item.brand}</td>
             <td>${item.season}</td>
             <td>${item.designer}</td>
             <td>${item.collection||''}</td>
-            <td>${new Date(item.createdAt).toLocaleString()}</td>`;
+            <td>${dt.toLocaleString()}</td>`;
           logBody.appendChild(tr);
         });
-      });
+      }, err => console.error('codes onSnapshot error', err));
     }
 
     // ===== Sezony =====
@@ -368,11 +373,10 @@
       seasonEl.value = defaultSeason;
     }
 
-    // ===== Podgląd kodu (informacyjny) =====
+    // ===== Podgląd kodu (orientacyjny) =====
     async function computePreview(){
       const a = assortmentEl.value; const b = brandEl.value;
-      // Podgląd jest orientacyjny — finalny numer nada transakcja podczas "Utwórz kod"
-      previewEl.textContent = `${a}_${b}…`;
+      previewEl.textContent = `${a}_${b}…`; // finalny numer nada transakcja
     }
 
     // ===== Transakcja licznika + zapis kodu =====
@@ -389,8 +393,8 @@
         return next;
       });
 
-      const code = `${a}_${b}${String(seq).padStart(3,'0')}`;
-      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, collection:coll, createdAt: Date.now() };
+      const code = `${a}_${b}${pad3(seq)}`;
+      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, collection:coll, createdAt: serverTimestamp() };
       await addDoc(codesCol, entry);
 
       await computePreview();
@@ -412,7 +416,7 @@
         const ref = doc(db, 'users', id);
         const s = await getDoc(ref);
         if (s.exists()) { suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; }
-        await setDoc(ref, { id, first: suFirst.value.trim()||'', last: suLast.value.trim()||'', pass:'', forceReset:true, role:'user', createdAt: Date.now() });
+        await setDoc(ref, { id, first: suFirst.value.trim()||'', last: suLast.value.trim()||'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
         signupDialog.close();
         setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
       } catch(e){
@@ -421,15 +425,18 @@
     });
 
     // ===== FLOW: Login / Password =====
+    function setLoggedIn(u, role){ AUTH={user:u, role}; saveAuth(AUTH); updateAuthUI(); showToast('Zalogowano.'); }
+    function setLoggedOut(){ AUTH={user:'', role:''}; saveAuth(AUTH); updateAuthUI(); showToast('Wylogowano.'); }
+
     authBtn.addEventListener('click', ()=>{
-      if(AUTH.user){ AUTH={user:'', role:''}; updateAuthUI(); return; }
+      if(AUTH.user){ setLoggedOut(); return; }
       loginError.style.display='none'; loginPassEl.value=''; loginDialog.showModal();
     });
 
     loginSubmit.addEventListener('click', async ()=>{
       const id = loginUserEl.value; const pass = loginPassEl.value;
       if (id === 'administrator'){
-        if (pass === 'mars'){ AUTH={ user:id, role:'admin' }; loginDialog.close(); updateAuthUI(); showToast('Zalogowano (admin).'); }
+        if (pass === 'mars'){ loginDialog.close(); setLoggedIn(id,'admin'); }
         else { loginError.style.display='block'; }
         return;
       }
@@ -447,7 +454,7 @@
       }
       const hash = await sha256Hex(pass);
       if (u.pass === hash){
-        AUTH={ user:id, role:'user' }; loginDialog.close(); updateAuthUI(); showToast('Zalogowano.');
+        loginDialog.close(); setLoggedIn(id,'user');
       } else {
         loginError.style.display='block';
       }
@@ -460,13 +467,11 @@
       const hash = await sha256Hex(p1);
       await updateDoc(doc(db,'users',u), { pass: hash, forceReset:false });
       setPwdDialog.close();
-      AUTH={ user:u, role:'user' }; updateAuthUI(); showToast('Hasło zapisane.');
+      setLoggedIn(u,'user');
     });
 
-    // ===== ADMIN =====
+    // ===== ADMIN (reset hasła) =====
     openAdmin.addEventListener('click', async ()=>{
-      // prosta lista do resetu haseł
-      const snap = await getDoc(doc(db,'users','administrator')).catch(()=>null);
       const userOpts = loginUserEl.innerHTML || '';
       adminList.innerHTML = userOpts
         .replaceAll('<option','<span class="chip" data-u')
@@ -518,8 +523,10 @@
       subscribeUsers();
       subscribeCodes();
       updateAuthUI();
-      // pokaż login na start (test mode UX)
-      if(!sessionStorage.getItem('login_demo_shown')){
+
+      // pokaż login tylko jeśli nie byliśmy zalogowani
+      const wasLogged = !!AUTH.user;
+      if(!wasLogged && !sessionStorage.getItem('login_demo_shown')){
         sessionStorage.setItem('login_demo_shown','1');
         loginDialog.showModal();
       }
