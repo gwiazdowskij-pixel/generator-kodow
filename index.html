@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GENERATOR KODÓW ESOTIQ & HENDERSON (v2.13.0 — modal signup+password, tests)</title>
+  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore)</title>
+
+  <!-- WSTRZYKNIĘTE: Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
+  <script>
+    window.__FIREBASE_CONFIG__ = {
+      apiKey: "AIzaSyDd5vjDCwkhSzlcxzmkodc8wpKWW5X8Bdo",
+      authDomain: "generator-kodow.firebaseapp.com",
+      projectId: "generator-kodow",
+      storageBucket: "generator-kodow.firebasestorage.app",
+      messagingSenderId: "91160304289",
+      appId: "1:91160304289:web:60d306e5c74c7609366ee0"
+    };
+  </script>
+
   <style>
     :root{ color-scheme: light dark; }
     html[data-theme="dark"]{
@@ -28,10 +41,11 @@
     }
 
     *{box-sizing:border-box}
-    body{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--text); background: var(--bg);}    
-    html[data-theme="dark"] body{ background:
-      radial-gradient(1200px 700px at 8% 0%, #0c1635 0%, var(--bg) 65%),
-      radial-gradient(1400px 900px at 100% 100%, #08122a 0%, var(--bg) 60%);
+    body{ margin:0; font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:var(--text); background: var(--bg);}
+    html[data-theme="dark"] body{
+      background:
+        radial-gradient(1200px 700px at 8% 0%, #0c1635 0%, var(--bg) 65%),
+        radial-gradient(1400px 900px at 100% 100%, #08122a 0%, var(--bg) 60%);
     }
 
     header{padding:28px 20px 12px}
@@ -61,58 +75,27 @@
     .btn:hover{background:linear-gradient(180deg,#132045,#0e152c); border-color:#2c3e6c}
     .btn:active{transform:translateY(1px)}
     .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600)); color:#071019; border-color:#0ea5e9}
-    .btn-danger{background:linear-gradient(180deg,#fb7185,#ef4444); color:#1a0408; border-color:#b91c1c}
     .btn-ghost{background:transparent}
 
     .toolbar{position:sticky; top:0; z-index:3; display:flex; flex-wrap:wrap; gap:8px; align-items:center; padding:8px; margin:-8px -8px 8px; border-radius:12px; backdrop-filter: blur(8px); background:var(--glass); border:1px solid var(--glass-border)}
-    .toolbar .control{flex:1 1 200px; min-width:160px}
-    .toolbar .search{flex:2 1 280px; min-width:200px}
-    .toolbar .btn{flex:0 0 auto}
-    .toolbar .spacer{flex:1 1 auto; min-width:0}
 
     .icon,.theme-icon{width:16px;height:16px;display:inline-block;vertical-align:middle}
 
     dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:460px }
     dialog::backdrop{background:rgba(0,0,0,.45)}
-    /* Fallback display for browsers bez <dialog> */
     dialog[open]{ display:block; }
     .modal-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--header)}
     .modal-title{margin:0;font-size:14px;text-transform:uppercase;color:var(--header-text)}
     .modal-body{padding:12px}
     .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--border)}
 
-    /* Tabela */
     table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
     thead th{position:sticky; top:0; background:var(--header); color:var(--header-text); border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:.5px}
     th,td{padding:14px 16px; border-bottom:1px solid var(--border); font-size:13px}
     tbody tr:nth-child(even){background:var(--table-stripe)}
-    tbody tr:hover{background:rgba(125,211,252,.07)}
-    td.right{text-align:right}
-    td:nth-child(1){min-width:120px}
-    td:nth-child(2){min-width:140px}
-    td:nth-child(3){min-width:130px}
-    td:nth-child(6){min-width:240px}
 
-    footer{color:var(--muted); text-align:center; padding:18px 0 36px}
     .toast{position:fixed; bottom:16px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; transition: all .25s ease; background:var(--modal-bg); border:1px solid var(--modal-border); padding:10px 14px; border-radius:12px; box-shadow:var(--shadow); font-size:14px}
     .toast.show{opacity:1; transform:translateX(-50%) translateY(0)}
-
-    html[data-theme="light"] .btn{background:linear-gradient(180deg,#ffffff,#eef3ff);color:#0f172a;border-color:#d9e0ee}
-    html[data-theme="light"] .btn:hover{background:linear-gradient(180deg,#f9fbff,#eaf1ff);border-color:#c6d2ea}
-    html[data-theme="light"] .btn-ghost{background:transparent;color:#0f172a;border-color:#d9e0ee}
-    html[data-theme="light"] .toolbar .btn{color:#0f172a}
-    html[data-theme="light"] .btn-primary{background:linear-gradient(180deg,#0ea5e9,#0284c7);color:#ffffff;border-color:#0284c7}
-    html[data-theme="light"] .btn-primary:hover{background:linear-gradient(180deg,#38bdf8,#0ea5e9)}
-    html[data-theme="light"] .btn-danger{color:#ffffff}
-
-    .code-box{display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--bg-elev); border:1px dashed var(--border); padding:14px 16px; border-radius:14px; font-size:14px; color:var(--text)}
-    .code-box .hint{color:var(--muted); font-size:13px}
-    #preview{font-family: inherit; font-weight:700; font-size:14px; color:var(--text)}
-    html[data-theme="dark"] .code-box{background:linear-gradient(180deg,#0a132a,#0a1223); border-color:#243351}
-
-    .chips{display:flex;flex-wrap:wrap;gap:8px}
-    .chip{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-elev);font-size:12px;color:var(--text)}
-    html[data-theme="dark"] .chip{background:#0e162f}
 
     .pw{position:relative}
     .pw input[type=password], .pw input[type=text]{padding-right:40px}
@@ -120,15 +103,6 @@
     .pw-toggle:hover{color:var(--text)}
 
     .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-elev);font-size:12px;color:var(--text)}
-    html[data-theme="dark"] .badge{background:#0e162f}
-
-    /* Polyfill backdrop */
-    .dlg-backdrop{position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1000}
-    dialog._pf{z-index:1001; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);}    
-
-    /* Tests */
-    details.tests{max-width:1280px;margin:16px auto;color:var(--muted)}
-    .test-log{padding:10px 12px; border:1px dashed var(--border); border-radius:12px; background:var(--bg-elev); white-space:pre-wrap; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px}
   </style>
 </head>
 <body>
@@ -136,31 +110,14 @@
     <div class="header-inner">
       <div>
         <h1 class="appTitle">GENERATOR KODÓW <span class="brand">ESOTIQ & HENDERSON</span></h1>
-        <p class="subtitle">Szybkie nadawanie kodów: marka, asortyment, sezon i projektant</p>
+        <p class="subtitle">Współdzielone online (Firestore, realtime) — TEST MODE włączony</p>
       </div>
       <div style="display:flex; gap:8px; align-items:center">
+        <span id="envBadge" class="badge">ENV: …</span>
         <span id="loggedBadge" class="badge" style="display:none"></span>
-        <button id="newUserBtn" class="btn" type="button" title="Dodaj nowego użytkownika">➕ Nowy użytkownik</button>
-        <button id="themeToggle" class="btn" type="button" title="Przełącz motyw">
-          <svg id="themeIcon" class="theme-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
-          <span id="themeLabel">Dark</span>
-        </button>
-        <button id="authBtn" class="btn" type="button" title="Zaloguj">
-          <svg id="authIcon" class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-            <polyline points="10 17 15 12 10 7"/>
-            <line x1="15" y1="12" x2="3" y2="12"/>
-          </svg>
-          <span id="authLabel">Zaloguj</span>
-        </button>
-        <button id="changePwdBtn" class="btn btn-ghost" type="button" style="display:none" title="Zmień hasło">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 11a4 4 0 1 0-4-4"/><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          Zmień hasło
-        </button>
-        <button id="openAdmin" class="btn btn-ghost" type="button" style="display:none" title="Panel administratora">
-          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V22a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H2a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0A1.65 1.65 0 0 0 9 2.09V2a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82h0A1.65 1.65 0 0 0 21.91 11H22a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"/></svg>
-          Panel admina
-        </button>
+        <button id="newUserBtn" class="btn" type="button">➕ Nowy użytkownik</button>
+        <button id="authBtn" class="btn" type="button"><span id="authLabel">Zaloguj</span></button>
+        <button id="openAdmin" class="btn btn-ghost" type="button" style="display:none">Panel admina</button>
       </div>
     </div>
   </header>
@@ -200,105 +157,64 @@
             </select>
           </div>
           <div class="control">
-            <label>Projektant/ka (po zalogowaniu)</label>
+            <label>Projektant/ka</label>
             <select id="designer" disabled>
               <option value="">— niezalogowano —</option>
-              <option>Ania</option>
-              <option>Grzegorz</option>
-              <option>Kuba</option>
-              <option>Łukasz</option>
-              <option>Olga</option>
-              <option>Rafał</option>
             </select>
           </div>
         </div>
 
         <div class="row" style="margin-top:14px">
-          <div class="control">
-            <label>Sezon</label>
-            <select id="season" required></select>
-          </div>
-          <div class="control">
-            <label>Dane kolekcji</label>
-            <input type="text" id="collection" list="collectionsDatalist" placeholder="np. #BARBIE / LINE:SENSUAL / CAPSULE:GEO-LOGIC / GROUP:LACE TOUCH" />
-            <datalist id="collectionsDatalist"></datalist>
-          </div>
+          <div class="control"><label>Sezon</label><select id="season" required></select></div>
+          <div class="control"><label>Dane kolekcji</label><input type="text" id="collection" placeholder="np. #BARBIE / LINE:SENSUAL / CAPSULE:GEO-LOGIC / GROUP:LACE TOUCH" /></div>
         </div>
 
-        <div class="code-box" style="margin-top:14px">
-          <div>
-            <div class="hint">Następny dostępny kod</div>
-            <div id="preview" class="code">—</div>
+        <div class="row" style="margin-top:14px; align-items:center">
+          <div class="control">
+            <div class="badge">Następny dostępny kod: <strong id="preview">—</strong></div>
           </div>
-          <div style="display:flex; gap:8px; align-items:center">
-            <button class="btn" id="refresh" type="button">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.13-3.36L23 10M1 14l5.36 5.36A9 9 0 0 0 20.49 15"/></svg>
-              Odśwież
-            </button>
-            <button class="btn btn-primary" id="create" type="button">
-              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Utwórz kod
-            </button>
+          <div style="display:flex; gap:8px; align-items:center; justify-content:flex-end">
+            <button class="btn" id="refresh" type="button">Odśwież</button>
+            <button class="btn btn-primary" id="create" type="button">Utwórz kod</button>
           </div>
         </div>
       </div>
     </section>
 
     <section class="card" style="margin-top:16px">
-      <h2>Historia, filtry i statystyki</h2>
-      <div class="body">
-        <div class="toolbar" role="group" aria-label="Filtry i narzędzia listy">
-          <div class="control"><label class="sr">Marka</label><select id="filterBrand"><option value="">Marka: wszystkie</option><option value="BV">Bloovii</option><option value="ES">Esotiq</option><option value="HE">Henderson</option><option value="HL">Henderson Ladies</option></select></div>
-          <div class="control"><label class="sr">Asortyment</label><select id="filterAssort"><option value="">Asortyment: wszystkie</option><option value="AP">APPLICATION</option><option value="BT">BUTTON</option><option value="BX">BOX</option><option value="EM">EMBROIDERY</option><option value="FAN">MISCELLANEOUS</option><option value="HAN">HANGER PRINT</option><option value="HG">HANGTAG</option><option value="LB">LABEL</option><option value="PC">SOCKS PACKING</option><option value="PR">PRINT</option><option value="PT">PATTERN</option><option value="RB">RUBBER</option><option value="ST">PRICE STICKER</option><option value="TP">TAPE</option><option value="WCL">WASHING LABEL</option></select></div>
-          <div class="control"><label class="sr">Sezon</label><select id="filterSeason"><option value="">Sezon: wszystkie</option></select></div>
-          <div class="control"><label class="sr">Projektant</label><select id="filterDesigner"><option value="">Projektant: wszyscy</option><option>Ania</option><option>Grzegorz</option><option>Kuba</option><option>Łukasz</option><option>Olga</option><option>Rafał</option></select></div>
-          <div class="control"><label class="sr">Czas</label><select id="filterDatePreset" title="Zakres czasu"><option value="">Czas: wszystkie</option><option value="today">Dziś</option><option value="yesterday">Wczoraj</option><option value="last7">Ostatni tydzień</option><option value="lastMonth">Ostatni miesiąc</option><option value="range">Od - Do…</option></select></div>
-          <div class="control search"><label class="sr">Szukaj</label><input id="searchText" type="text" placeholder="Szukaj w kodzie/kolekcji…" /></div>
-          <span class="spacer"></span>
-          <button class="btn" id="clearFilters" type="button">Wyczyść filtry</button>
-          <button class="btn" id="exportCsv" type="button">Eksport CSV</button>
-          <button class="btn" id="exportXlsx" type="button" title="Eksport do Excela (.xls)">Eksport XLS</button>
-          <button class="btn" id="quickMine" type="button" title="Filtruj moje (wymaga zalogowania)">Moje</button>
-        </div>
-
-        <div id="stats" style="margin:8px -8px 0; padding:0 8px" class="chips"></div>
-
-        <div class="body" style="max-height: 520px; overflow: auto; margin:-8px; border-radius: 12px">
-          <table id="logTable">
-            <thead>
-              <tr>
-                <th>Kod</th>
-                <th>Asortyment</th>
-                <th>Marka</th>
-                <th>Sezon</th>
-                <th>Projektant</th>
-                <th>Kolekcja</th>
-                <th>Data</th>
-                <th class="right">Akcje</th>
-              </tr>
-            </thead>
-            <tbody id="logBody"></tbody>
-          </table>
-        </div>
+      <h2>Historia</h2>
+      <div class="body" style="max-height: 520px; overflow: auto; margin:-8px; border-radius: 12px">
+        <table id="logTable">
+          <thead>
+            <tr>
+              <th>Kod</th>
+              <th>Asortyment</th>
+              <th>Marka</th>
+              <th>Sezon</th>
+              <th>Projektant</th>
+              <th>Kolekcja</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody id="logBody"></tbody>
+        </table>
       </div>
     </section>
   </div>
 
-  <footer>© ESOTIQ & HENDERSON S.A.</footer>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <div id="toast" class="toast" role="status" aria-live="polite">Skopiowano kod do schowka</div>
-
-  <!-- MODALS: Signup / Login / Set Password / Admin Panel / Change Password -->
+  <!-- DIALOGI (pop-up) -->
   <dialog id="signupDialog">
     <div class="modal-header">
       <h3 class="modal-title">Nowy użytkownik</h3>
       <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
     </div>
     <div class="modal-body">
-      <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. Zuzanna" /></div>
+      <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. zuza.kowalska" /></div>
       <div class="row" style="margin-top:8px">
-        <div class="control"><label>Imię (opcjonalnie)</label><input id="suFirst" type="text" placeholder="np. Zuzanna" /></div>
-        <div class="control"><label>Nazwisko (opcjonalnie)</label><input id="suLast" type="text" placeholder="np. Kowalska" /></div>
+        <div class="control"><label>Imię (opcjonalnie)</label><input id="suFirst" type="text" /></div>
+        <div class="control"><label>Nazwisko (opcjonalnie)</label><input id="suLast" type="text" /></div>
       </div>
       <div id="suError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div>
     </div>
@@ -314,14 +230,8 @@
       <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
     </div>
     <div class="modal-body">
-      <div class="control">
-        <label>Użytkownik</label>
-        <select id="loginUser"></select>
-      </div>
-      <div class="control" style="margin-top:8px">
-        <label>Hasło</label>
-        <div class="pw"><input id="loginPass" type="password" placeholder="Wpisz hasło" /><button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
+      <div class="control"><label>Użytkownik</label><select id="loginUser"></select></div>
+      <div class="control" style="margin-top:8px"><label>Hasło</label><div class="pw"><input id="loginPass" type="password" placeholder="Wpisz hasło" /><button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
       <div id="loginError" class="hint" style="color:#fca5a5; display:none; margin-top:6px">Błędne dane logowania.</div>
     </div>
     <div class="modal-actions">
@@ -335,16 +245,10 @@
       <h3 class="modal-title">Ustaw nowe hasło</h3>
     </div>
     <div class="modal-body">
-      <p class="hint">Ustaw dowolne hasło (min. 8 znaków, max 16).</p>
-      <div class="control">
-        <label>Nowe hasło</label>
-        <div class="pw"><input id="newPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
-      <div class="control">
-        <label>Powtórz hasło</label>
-        <div class="pw"><input id="newPwd2" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24  " fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
-      <div id="setPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px">Hasła muszą być identyczne i mieć min. 8 znaków.</div>
+      <p class="hint">Hasło: min. 8 znaków</p>
+      <div class="control"><label>Nowe hasło</label><div class="pw"><input id="newPwd" type="password" maxlength="64" /><button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
+      <div class="control"><label>Powtórz hasło</label><div class="pw"><input id="newPwd2" type="password" maxlength="64" /><button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
+      <div id="setPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div>
     </div>
     <div class="modal-actions">
       <button class="btn" type="button" data-close>Anuluj</button>
@@ -353,222 +257,273 @@
   </dialog>
 
   <dialog id="adminDialog">
-    <div class="modal-header">
-      <h3 class="modal-title">Panel administratora</h3>
-      <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
-    </div>
-    <div class="modal-body">
-      <p class="hint">Reset przywraca hasło do wartości tymczasowej i wymusza ustawienie nowego przy następnym logowaniu.</p>
-      <div id="adminList" class="chips" style="margin-top:8px"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn" type="button" data-close>Zamknij</button>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">Panel administratora</h3><button class="btn btn-ghost" type="button" data-close>Zamknij</button></div>
+    <div class="modal-body"><p class="hint">Zresetuj hasło użytkownika (ustawi puste hasło i wymusi zmianę przy następnym logowaniu).</p><div id="adminList" class="chips" style="margin-top:8px"></div></div>
+    <div class="modal-actions"><button class="btn" type="button" data-close>Zamknij</button></div>
   </dialog>
 
-  <dialog id="changePwdDialog">
-    <div class="modal-header">
-      <h3 class="modal-title">Zmień hasło</h3>
-      <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
-    </div>
-    <div class="modal-body">
-      <div class="control">
-        <label>Obecne hasło</label>
-        <div class="pw"><input id="oldPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="oldPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
-      <div class="control">
-        <label>Nowe hasło</label>
-        <div class="pw"><input id="chgNewPwd" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="chgNewPwd" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
-      <div class="control">
-        <label>Powtórz hasło</label>
-        <div class="pw"><input id="chgNewPwd2" type="password" maxlength="16" /><button type="button" class="pw-toggle" data-target="chgNewPwd2" aria-label="Pokaż/ukryj hasło"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg></button></div>
-      </div>
-      <div id="chgPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div>
-    </div>
-    <div class="modal-actions">
-      <button class="btn" type="button" data-close>Anuluj</button>
-      <button id="chgPwdSave" class="btn btn-primary" type="button">Zapisz</button>
-    </div>
-  </dialog>
+  <script type="module">
+    // ===== Firebase (ESM z CDN) =====
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import {
+      getFirestore, doc, getDoc, setDoc, updateDoc,
+      collection, addDoc, query, orderBy, onSnapshot, runTransaction
+    } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-  <details class="tests">
-    <summary>Testy E2E (kliknij, aby rozwinąć)</summary>
-    <div class="test-log" id="testLog"></div>
-    <div style="margin-top:8px; display:flex; gap:8px">
-      <button id="runTests" class="btn" type="button">Uruchom testy</button>
-    </div>
-  </details>
+    // ===== DOM =====
+    const $ = id => document.getElementById(id);
+    const envBadge = $('envBadge'); const toast = $('toast');
+    const brandEl = $('brand'); const assortmentEl = $('assortment'); const designerEl = $('designer'); const seasonEl = $('season'); const collectionEl = $('collection'); const previewEl = $('preview'); const refreshBtn = $('refresh'); const createBtn = $('create'); const logBody = $('logBody');
+    const newUserBtn = $('newUserBtn'); const signupDialog = $('signupDialog'); const suUser = $('suUser'); const suFirst = $('suFirst'); const suLast = $('suLast'); const suError = $('suError'); const suNext = $('suNext');
+    const loginDialog = $('loginDialog'); const loginUserEl = $('loginUser'); const loginPassEl = $('loginPass'); const loginError = $('loginError'); const loginSubmit = $('loginSubmit');
+    const setPwdDialog = $('setPwdDialog'); const newPwd = $('newPwd'); const newPwd2 = $('newPwd2'); const setPwdError = $('setPwdError'); const setPwdSave = $('setPwdSave');
+    const authBtn = $('authBtn'); const authLabel = $('authLabel'); const openAdmin = $('openAdmin'); const adminList = $('adminList'); const loggedBadge = $('loggedBadge');
 
-  <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const $ = (id) => document.getElementById(id);
-    const on = (el, ev, fn) => { if(el) el.addEventListener(ev, fn); };
-
-    // ====== DIALOG POLYFILL ======
-    const supportsDialog = typeof HTMLDialogElement !== 'undefined' && 'showModal' in HTMLDialogElement.prototype;
-    let backdropEl = null;
-    function ensureBackdrop(){ if(backdropEl) return backdropEl; backdropEl = document.createElement('div'); backdropEl.className = 'dlg-backdrop'; backdropEl.addEventListener('click', ()=>{ const open = document.querySelector('dialog[open]._pf'); if(open) closeModal(open); }); return backdropEl; }
-    function openModal(dlg){ if(!dlg) return; if(supportsDialog){ dlg.showModal(); return; } dlg.classList.add('_pf'); dlg.setAttribute('open',''); document.body.appendChild(ensureBackdrop()); }
-    function closeModal(dlg){ if(!dlg) return; if(supportsDialog){ dlg.close(); return; } dlg.removeAttribute('open'); dlg.classList.remove('_pf'); if(backdropEl && backdropEl.parentNode){ backdropEl.parentNode.removeChild(backdropEl); } }
-    document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> closeModal(e.target.closest('dialog'))));
-
-    // ===== THEME TOGGLE =====
-    const themeToggle = $('themeToggle'); const themeLabel = $('themeLabel'); const themeIcon = $('themeIcon'); const savedTheme = localStorage.getItem('halina_theme');
-    function setThemeIcon(theme){ if(!themeIcon) return; themeIcon.innerHTML = theme==='dark' ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>' : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; }
-    (function(){ const t = savedTheme || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); document.documentElement.setAttribute('data-theme', t); setThemeIcon(t); if(themeLabel) themeLabel.textContent = t==='dark' ? 'Dark' : 'Light'; localStorage.setItem('halina_theme', t); })();
-    on(themeToggle, 'click', ()=>{ const cur = document.documentElement.getAttribute('data-theme'); const next = cur==='dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-theme', next); localStorage.setItem('halina_theme', next); setThemeIcon(next); if(themeLabel) themeLabel.textContent = next==='dark' ? 'Dark' : 'Light'; });
-
-    // ===== STORAGE KEYS =====
-    const STORAGE_KEYS = { COUNTERS:'halina_code_counters_v1', LOG:'halina_code_log_v1', SYNC:'halina_code_sync_v1', AUTH:'halina_code_auth_v1', USERS:'halina_users_v1' };
-    function loadJSON(key, fallback){ try{ return JSON.parse(localStorage.getItem(key)) ?? fallback }catch{ return fallback } }
-    function saveJSON(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
-    function keyFor(a,b){ return `${a}_${b}` }
+    // ===== UTIL =====
     const pad3 = n => String(n).padStart(3,'0');
+    const sha256Hex = async (text)=>{ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); };
+    const showToast = (m)=>{ if(!toast) return; toast.textContent = m; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'),1600); };
 
-    // ===== STATE =====
-    let counters = loadJSON(STORAGE_KEYS.COUNTERS, {});
-    let log = loadJSON(STORAGE_KEYS.LOG, []);
-    let auth = loadJSON(STORAGE_KEYS.AUTH, { designer:'' , role:''});
-    let users = loadJSON(STORAGE_KEYS.USERS, { users:{}, forceReset:{} });
+    // ===== Konfiguracja i inicjalizacja Firebase =====
+    const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
+    const app = initializeApp(firebaseConfig);
+    const db  = getFirestore(app);
 
+    envBadge.textContent = 'ENV: FIREBASE (online, współdzielone — TEST MODE)';
+
+    // ===== MAPPINGI =====
     const BRAND_MAP = { ES:'Esotiq', HE:'Henderson', BV:'Bloovii', HL:'Henderson Ladies' };
     const ASSORTMENT_MAP = { PR:'PRINT', PT:'PATTERN', EM:'EMBROIDERY', RB:'RUBBER', TP:'TAPE', AP:'APPLICATION', LB:'LABEL', HG:'HANGTAG', BX:'BOX', PC:'SOCKS PACKING', ST:'PRICE STICKER', FAN:'MISCELLANEOUS', BT:'BUTTON', HAN:'HANGER PRINT', WCL:'WASHING LABEL' };
-    const DESIGNERS_DEFAULT = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
 
-    // ===== ELEMENTS =====
-    const brandEl = $('brand'); const assortmentEl = $('assortment'); const designerEl = $('designer'); const seasonEl = $('season'); const collectionEl = $('collection'); const previewEl = $('preview');
-    const refreshBtn = $('refresh'); const createBtn = $('create'); const logBody = $('logBody');
-    const filterBrand = $('filterBrand'); const filterAssort = $('filterAssort'); const filterSeason = $('filterSeason'); const filterDesigner = $('filterDesigner'); const searchText = $('searchText'); const statsEl = $('stats'); const quickMineBtn = $('quickMine');
-    const authBtn = $('authBtn'); const authLabel = $('authLabel'); const authIcon = $('authIcon'); const loggedBadge = $('loggedBadge'); const openAdminBtn = $('openAdmin'); const changePwdBtn = $('changePwdBtn');
-    const changePwdDialog = $('changePwdDialog'); const oldPwdEl = $('oldPwd'); const chgNewPwdEl = $('chgNewPwd'); const chgNewPwd2El = $('chgNewPwd2'); const chgPwdError = $('chgPwdError');
+    // ===== Kolekcje / dokumenty =====
+    const usersCol = collection(db, 'users');
+    const codesCol = collection(db, 'codes');
+    const countersDoc = doc(db, 'meta', 'counters');
 
-    // Signup modal
-    const newUserBtn = $('newUserBtn'); const signupDialog = $('signupDialog'); const suUser = $('suUser'); const suFirst = $('suFirst'); const suLast = $('suLast'); const suError = $('suError'); const suNext = $('suNext');
+    // ===== AUTH (test mode) =====
+    let AUTH = { user:'', role:'' };
 
-    // Login & set password
-    const loginDialog = $('loginDialog'); const loginUserEl = $('loginUser'); const loginPassEl = $('loginPass'); const loginError = $('loginError'); const loginSubmit = $('loginSubmit');
-    const setPwdDialog = $('setPwdDialog'); const newPwdEl = $('newPwd'); const newPwd2El = $('newPwd2'); const setPwdError = $('setPwdError'); const setPwdSave = $('setPwdSave');
+    function updateAuthUI(){
+      const logged = !!AUTH.user;
+      authLabel.textContent = logged ? 'Wyloguj' : 'Zaloguj';
+      openAdmin.style.display = AUTH.role==='admin' ? 'inline-flex' : 'none';
+      if (designerEl){
+        designerEl.innerHTML = logged && AUTH.role==='user' ? `<option>${AUTH.user}</option>` : '<option value="">— niezalogowano —</option>';
+        designerEl.disabled = true;
+      }
+      if (loggedBadge){
+        if (logged) { loggedBadge.style.display='inline-flex'; loggedBadge.textContent = `Zalogowany: ${AUTH.user}${AUTH.role==='admin'?' (admin)':''}`; }
+        else { loggedBadge.style.display='none'; loggedBadge.textContent=''; }
+      }
+    }
 
-    // ===== USERS INIT =====
-    function ensureUsers(){ users.users = users.users || {}; users.forceReset = users.forceReset || {}; DESIGNERS_DEFAULT.forEach(u=>{ if(!(u in users.users)){ users.users[u] = ''; users.forceReset[u] = true; } }); if(!('administrator' in users.users)) users.users['administrator'] = 'mars'; saveJSON(STORAGE_KEYS.USERS, users); }
-    ensureUsers();
+    // ===== Realtime: Users =====
+    function subscribeUsers(){
+      const qUsers = query(usersCol, orderBy('id'));
+      onSnapshot(qUsers, snap=>{
+        const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
+        // auto-seed (TEST MODE): jeśli nie ma podstawowych userów, dopisz ich jednorazowo
+        if (arr.length === 0) {
+          (async ()=>{
+            const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
+            for (const u of seed) {
+              await setDoc(doc(db,'users',u), { id:u, first:'', last:'', pass:'', forceReset:true, role:'user', createdAt: Date.now() });
+            }
+            await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: Date.now() });
+          })().catch(console.error);
+        }
+      });
+    }
 
-    function rebuildLoginUsers(){ const names = Object.keys(users.users).filter(n=>n!=='administrator').sort((a,b)=> a.localeCompare(b,'pl')); const opts = names.map(n=>`<option value="${n}">${n}</option>`).join('') + '<option value="administrator">administrator</option>'; loginUserEl.innerHTML = opts; }
+    // ===== Realtime: Codes =====
+    function subscribeCodes(){
+      const qCodes = query(codesCol, orderBy('createdAt'));
+      onSnapshot(qCodes, snap=>{
+        const arr = snap.docs.map(d=> d.data());
+        logBody.innerHTML='';
+        arr.slice().reverse().forEach(item=>{
+          const tr=document.createElement('tr');
+          tr.innerHTML = `<td><strong>${item.code}</strong></td>
+            <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
+            <td>${BRAND_MAP[item.brand]||item.brand}</td>
+            <td>${item.season}</td>
+            <td>${item.designer}</td>
+            <td>${item.collection||''}</td>
+            <td>${new Date(item.createdAt).toLocaleString()}</td>`;
+          logBody.appendChild(tr);
+        });
+      });
+    }
 
-    // ===== SEASONS =====
-    function buildSeasons(){ if(!seasonEl || !filterSeason) return; const now = new Date(); const y = now.getFullYear(); const years=[y,y+1,y+2]; const opts=[]; years.forEach(yr=>{ opts.push(`SS${yr}`); opts.push(`AW${yr}`); }); seasonEl.innerHTML = opts.map(s=>`<option>${s}</option>`).join(''); filterSeason.innerHTML = '<option value="">Sezon: wszystkie</option>' + opts.map(s=>`<option value="${s}">${s}</option>`).join(''); const defaultSeason = (now.getMonth()>=8) ? `AW${y}` : `SS${y}`; seasonEl.value = defaultSeason; }
+    // ===== Sezony =====
+    function buildSeasons(){
+      const now = new Date();
+      const y = now.getFullYear();
+      const years=[y,y+1,y+2];
+      const opts=[];
+      years.forEach(yr=>{ opts.push(`SS${yr}`); opts.push(`AW${yr}`); });
+      seasonEl.innerHTML = opts.map(s=>`<option>${s}</option>`).join('');
+      const defaultSeason = (now.getMonth()>=8) ? `AW${y}` : `SS${y}`;
+      seasonEl.value = defaultSeason;
+    }
 
-    // ===== CODE ENGINE =====
-    const CODE_RE = /^(PR|PT|EM|RB|TP|AP|LB|HG|BX|PC|ST|FAN|BT|HAN|WCL)_(ES|HE|BV|HL)(\d{3})$/;
-    function rebuildCountersFromLog(){ const maxes = {}; for(const e of log){ const m = CODE_RE.exec(e.code||''); if(!m) continue; const k = keyFor(m[1], m[2]); const seq = parseInt(m[3],10); maxes[k] = Math.max(maxes[k]||0, seq); } counters = Object.assign({}, counters, maxes); saveJSON(STORAGE_KEYS.COUNTERS, counters); }
-    function nextSeqFor(a,b){ const k = keyFor(a,b); let max=counters[k]||0; for(const e of log){ if(e.assortment===a && e.brand===b){ const m=CODE_RE.exec(e.code||''); if(m) max=Math.max(max, parseInt(m[3],10)); } } return max+1; }
-    function codeExists(code){ return log.some(e => e.code === code); }
-    function computeNextCode(){ const a=assortmentEl.value, b=brandEl.value, seq=nextSeqFor(a,b); return `${a}_${b}${pad3(seq)}`; }
-    function refreshPreview(){ if(previewEl) previewEl.textContent = computeNextCode(); }
+    // ===== Podgląd kodu (informacyjny) =====
+    async function computePreview(){
+      const a = assortmentEl.value; const b = brandEl.value;
+      // Podgląd jest orientacyjny — finalny numer nada transakcja podczas "Utwórz kod"
+      previewEl.textContent = `${a}_${b}…`;
+    }
 
-    // ===== COLLECTION AUTOCOMPLETE =====
-    function buildCollectionDatalist(){ const dl=document.getElementById('collectionsDatalist'); if(!dl) return; const map={}; log.forEach(e=>{ const c=(e.collection||'').trim(); if(c){ map[c]=(map[c]||0)+1; } }); const html = Object.entries(map).sort((a,b)=> b[1]-a[1] || a[0].localeCompare(b[0])).map(([name])=>`<option value="${name}">`).join(''); dl.innerHTML=html; }
+    // ===== Transakcja licznika + zapis kodu =====
+    async function createCode(){
+      if(!AUTH.user || AUTH.role!=='user'){ alert('Zaloguj się jako projektant/ka.'); return; }
+      const a = assortmentEl.value; const b = brandEl.value; const s = seasonEl.value; const coll = (collectionEl.value||'').trim();
 
-    // ===== LIST RENDER =====
-    function visibleRows(){ const t=(searchText?.value||'').toLowerCase(); const preset = (document.getElementById('filterDatePreset')?.value)||''; let fromTS = null, toTS = null; if(preset){ const now = new Date(); const startOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime(); const endOfDay = d => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23,59,59,999).getTime(); if(preset==='today'){ fromTS = startOfDay(now); toTS = endOfDay(now); } else if(preset==='yesterday'){ const y = new Date(now.getTime()-86400000); fromTS = startOfDay(y); toTS = endOfDay(y); } else if(preset==='last7'){ const seven = new Date(now.getTime()-6*86400000); fromTS = startOfDay(seven); toTS = endOfDay(now); } else if(preset==='lastMonth'){ const m = new Date(now); m.setMonth(m.getMonth()-1); fromTS = startOfDay(m); toTS = endOfDay(now); } }
-      return log.filter(e=>{ if(filterBrand && filterBrand.value && e.brand!==filterBrand.value) return false; if(filterAssort && filterAssort.value && e.assortment!==filterAssort.value) return false; if(filterSeason && filterSeason.value && e.season!==filterSeason.value) return false; if(filterDesigner && filterDesigner.value && e.designer!==filterDesigner.value) return false; if(fromTS!==null && toTS!==null){ const ts = new Date(e.createdAt).getTime(); if(!(ts>=fromTS && ts<=toTS)) return false; } if(t){ const hay = `${e.code} ${e.collection}`.toLowerCase(); if(!hay.includes(t)) return false; } return true; }); }
+      const seq = await runTransaction(db, async (tx)=>{
+        const snap = await tx.get(countersDoc);
+        const data = snap.exists() ? snap.data() : {};
+        const key = `${a}_${b}`;
+        const next = Number(data[key]||0) + 1;
+        tx.set(countersDoc, Object.assign({}, data, { [key]: next }));
+        return next;
+      });
 
-    function renderLog(){ if(!logBody || !statsEl) return; const rows = visibleRows(); logBody.innerHTML=''; rows.slice().reverse().forEach(item=>{ const tr=document.createElement('tr'); tr.innerHTML = `<td><strong>${item.code}</strong></td>
-          <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
-          <td>${BRAND_MAP[item.brand]||item.brand}</td>
-          <td>${item.season}</td>
-          <td>${item.designer}</td>
-          <td>${item.collection||''}</td>
-          <td class="hint">${new Date(item.createdAt).toLocaleString()}</td>
-          <td class="right"><button class="btn" data-action="copy" data-code="${item.code}">Kopiuj</button></td>`; logBody.appendChild(tr); }); renderStats(rows); }
+      const code = `${a}_${b}${String(seq).padStart(3,'0')}`;
+      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, collection:coll, createdAt: Date.now() };
+      await addDoc(codesCol, entry);
 
-    function renderStats(rows){ if(!statsEl) return; const byDesigner={}, bySeason={}, byAssort={}; rows.forEach(r=>{ byDesigner[r.designer]=(byDesigner[r.designer]||0)+1; bySeason[r.season]=(bySeason[r.season]||0)+1; byAssort[r.assortment]=(byAssort[r.assortment]||0)+1; }); const chip=(k,v)=>`<span class="chip"><strong>${k}:</strong> ${v}</span>`; const toBlock=(obj,label)=> Object.keys(obj).sort().map(k=>chip(label==='ASSORT'?(ASSORTMENT_MAP[k]||k):k, obj[k])).join(''); statsEl.innerHTML = `${chip('Widoczne', rows.length)} ${toBlock(byDesigner)} ${toBlock(bySeason)} ${toBlock(byAssort,'ASSORT')}`; }
+      await computePreview();
+      showToast('Utworzono: '+code);
+      try{ await navigator.clipboard.writeText(code); }catch{}
+    }
 
-    // ===== AUTH / LOGIN FLOW =====
-    const ADMIN_LOGIN = 'administrator';
-    const ADMIN_PASS = 'mars';
-
-    function updateAuthButtonUI(){ if(!(authBtn && authLabel && authIcon)) return; const logged = !!(auth.designer || auth.role==='admin'); if(logged){ authLabel.textContent = 'Wyloguj'; authBtn.title = 'Wyloguj'; authIcon.innerHTML = '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>'; authBtn.dataset.mode = 'logout'; if(changePwdBtn) changePwdBtn.style.display = (auth.role==='user') ? 'inline-flex' : 'none'; if(loggedBadge){ loggedBadge.textContent = `Zalogowany jako: ${auth.designer || '—'}${auth.role==='admin' ? ' (admin)' : ''}`; loggedBadge.style.display='inline-flex'; } } else { authLabel.textContent = 'Zaloguj'; authBtn.title = 'Zaloguj'; authIcon.innerHTML = '<path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/>'; authBtn.dataset.mode = 'login'; if(changePwdBtn) changePwdBtn.style.display = 'none'; if(loggedBadge){ loggedBadge.style.display='none'; loggedBadge.textContent=''; } } }
-
-    function buildAdminList(){ const names = Object.keys(users.users).filter(n=>n!==ADMIN_LOGIN).sort((a,b)=> a.localeCompare(b,'pl')); const html = names.map(u=>`<span class="chip"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`).join(''); const adminList=$('adminList'); if(adminList) adminList.innerHTML = html; }
-
-    function setLoggedIn(user, role){ auth = { designer: user, role: role }; saveJSON(STORAGE_KEYS.AUTH, auth); if(designerEl){ designerEl.innerHTML = ''; const opt = document.createElement('option'); opt.value = user; opt.textContent = role==='admin' ? '— niezalogowano —' : user; designerEl.appendChild(opt); designerEl.value = role==='admin' ? '' : user; designerEl.disabled = true; } if(openAdminBtn) openAdminBtn.style.display = role==='admin' ? 'inline-flex' : 'none'; updateAuthButtonUI(); showToast(`Zalogowano: ${user}${role==='admin'?' (admin)':''}`); }
-    function setLoggedOut(){ auth = { designer:'', role:'' }; saveJSON(STORAGE_KEYS.AUTH, auth); if(designerEl){ designerEl.innerHTML = '<option value="">— niezalogowano —</option><option>Ania</option><option>Grzegorz</option><option>Kuba</option><option>Łukasz</option><option>Olga</option><option>Rafał</option>'; designerEl.value = ''; designerEl.disabled = true; } if(openAdminBtn) openAdminBtn.style.display = 'none'; updateAuthButtonUI(); showToast('Wylogowano'); }
-
-    function resetUserPassword(username){ users.users[username] = ''; users.forceReset[username] = true; saveJSON(STORAGE_KEYS.USERS, users); buildAdminList(); rebuildLoginUsers(); showToast(`Zresetowano hasło użytkownika: ${username}`); }
-
-    function tryLogin(user, pass){ if(user===ADMIN_LOGIN){ if(pass===ADMIN_PASS){ setLoggedIn(user,'admin'); return { ok:true, needChange:false }; } return { ok:false }; } const stored = users.users[user] || ''; const mustChange = users.forceReset[user] === true || stored===''; if(mustChange){ if(pass==='Atlas123'){ setLoggedIn(user,'user'); return { ok:true, needChange:true }; } return { ok:false }; } else { if(pass===stored){ setLoggedIn(user,'user'); return { ok:true, needChange:false }; } return { ok:false }; } }
-
-    // ===== SIGNUP (POPUP) =====
-    function validUsername(u){ return /^[A-Za-zÀ-ÿ][A-Za-zÀ-ÿ0-9_.\- ]{1,31}$/.test(u); }
-    on(newUserBtn,'click', ()=>{ if(suError) suError.style.display='none'; if(suUser) suUser.value=''; if(suFirst) suFirst.value=''; if(suLast) suLast.value=''; openModal(signupDialog); suUser?.focus(); });
-    on(suNext,'click', ()=>{ const u = (suUser?.value||'').trim(); if(!u){ suError.textContent='Podaj nazwę użytkownika.'; suError.style.display='block'; return; } if(!validUsername(u)){ suError.textContent='Nazwa użytkownika: litera na start, 2–32 znaki (litery/cyfry . _ - spacja).'; suError.style.display='block'; return; } if(users.users[u]!==undefined){ suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; } users.users[u] = ''; users.forceReset[u] = true; saveJSON(STORAGE_KEYS.USERS, users); rebuildLoginUsers(); closeModal(signupDialog); // od razu ustaw hasło w pop-up
-      if(newPwdEl) newPwdEl.value=''; if(newPwd2El) newPwd2El.value=''; if(setPwdError) setPwdError.style.display='none'; if(setPwdDialog) setPwdDialog.dataset.pendingUser = u; openModal(setPwdDialog); });
-
-    // ===== LOGIN / SET PASSWORD / CHANGE PASSWORD =====
-    on(authBtn,'click', ()=>{ if(authBtn.dataset.mode==='logout'){ setLoggedOut(); return; } if(loginError) loginError.style.display='none'; if(loginPassEl) loginPassEl.value=''; rebuildLoginUsers(); openModal(loginDialog); });
-    on($('loginSubmit'),'click', ()=>{ const user = loginUserEl?.value; const pass = loginPassEl?.value; const res = tryLogin(user, pass); if(!res.ok){ if(loginError) loginError.style.display='block'; return; } closeModal(loginDialog); if(res.needChange){ if(newPwdEl) newPwdEl.value=''; if(newPwd2El) newPwd2El.value=''; if(setPwdError) setPwdError.style.display='none'; if(setPwdDialog) setPwdDialog.dataset.pendingUser = user; openModal(setPwdDialog); } });
-
-    on(setPwdSave,'click', ()=>{ const u = setPwdDialog?.dataset?.pendingUser; if(!u){ closeModal(setPwdDialog); return; } const p1 = newPwdEl?.value||''; const p2 = newPwd2El?.value||''; if(p1.length<8 || p1!==p2){ if(setPwdError){ setPwdError.textContent='Hasła muszą być identyczne i mieć min. 8 znaków.'; setPwdError.style.display='block'; } return; } users.users[u] = p1; users.forceReset[u] = false; saveJSON(STORAGE_KEYS.USERS, users); closeModal(setPwdDialog); setLoggedIn(u,'user'); showToast('Hasło zapisane.'); });
-
-    on(changePwdBtn,'click', ()=>{ if(auth.role!=='user'){ return; } if(chgPwdError) chgPwdError.style.display='none'; if(oldPwdEl) oldPwdEl.value=''; if(chgNewPwdEl) chgNewPwdEl.value=''; if(chgNewPwd2El) chgNewPwd2El.value=''; openModal(changePwdDialog); });
-    on($('chgPwdSave'),'click', ()=>{ if(auth.role!=='user'){ closeModal(changePwdDialog); return; } const u = auth.designer; const current = users.users[u] || ''; const oldp = oldPwdEl?.value || ''; const p1 = chgNewPwdEl?.value || ''; const p2 = chgNewPwd2El?.value || ''; if(current && oldp!==current){ chgPwdError.textContent='Błędne obecne hasło.'; chgPwdError.style.display='block'; return; } if(p1.length<8 || p1!==p2){ chgPwdError.textContent='Hasła muszą być identyczne (min. 8).'; chgPwdError.style.display='block'; return; } users.users[u] = p1; users.forceReset[u] = false; saveJSON(STORAGE_KEYS.USERS, users); closeModal(changePwdDialog); showToast('Hasło zmienione.'); });
-
-    on(openAdminBtn,'click', ()=>{ buildAdminList(); openModal($('adminDialog')); });
-    on($('adminList'),'click', (e)=>{ const btn = e.target.closest('button[data-reset]'); if(!btn) return; const who = btn.getAttribute('data-reset'); if(confirm(`Zresetować hasło użytkownika ${who}?`)) resetUserPassword(who); });
-
-    // ===== CREATE ENTRY =====
-    function addEntry(){ if(!auth.designer || auth.role==='admin'){ alert('Zaloguj się jako projektant/ka, aby tworzyć kody.'); return; } const brand = brandEl.value; const assortment = assortmentEl.value; const season = seasonEl.value; const collection = (collectionEl?.value||'').trim(); let seq = nextSeqFor(assortment, brand); let code = `${assortment}_${brand}${pad3(seq)}`; while(codeExists(code)){ seq++; code = `${assortment}_${brand}${pad3(seq)}`; } counters[keyFor(assortment, brand)] = seq; saveJSON(STORAGE_KEYS.COUNTERS, counters); const createdAt = new Date().toISOString(); const entry = { code, assortment, brand, designer: auth.designer, season, collection, createdAt }; log.push(entry); saveJSON(STORAGE_KEYS.LOG, log); refreshPreview(); renderLog(); buildCollectionDatalist(); showToast('Nowy kod skopiowany: '+code); navigator.clipboard?.writeText(code).catch(()=>{}); }
-
-    // ===== CSV & XLS =====
-    function exportCSV(){ const sep = ';'; const header=['code','assortment','brand','season','designer','collection','created_at']; const rows = log.map(e=>[e.code,e.assortment,e.brand,e.season,e.designer,e.collection||'',e.createdAt]); const csvEscape = (val)=>{ const s=String(val??''); return /[";\n]/.test(s) ? '"'+s.replaceAll('"','""')+'"' : s; }; const csv = [header.join(sep), ...rows.map(r=> r.map(csvEscape).join(sep))].join('\n'); const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='halina_codes_export.csv'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-    function exportXLS(){ const escXml = (s)=> String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); const header=['code','assortment','brand','season','designer','collection','created_at']; const rows = log.map(e=>[e.code,e.assortment,e.brand,e.season,e.designer,e.collection||'',e.createdAt]); const rowXml = (arr)=> '<Row>'+arr.map(v=>`<Cell><Data ss:Type="String">${escXml(v)}</Data></Cell>`).join('')+'</Row>'; const xml = `<?xml version="1.0"?><?mso-application progid="Excel.Sheet"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="codes"><Table>${rowXml(header)}${rows.map(rowXml).join('')}</Table></Worksheet></Workbook>`; const blob = new Blob([xml], {type:'application/vnd.ms-excel'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='halina_codes_export.xls'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000); }
-
-    // ===== INIT =====
-    function init(){ rebuildCountersFromLog(); buildSeasons(); buildCollectionDatalist(); [brandEl, assortmentEl].forEach(el=> on(el,'change', refreshPreview)); on(filterBrand,'change', renderLog); on(filterAssort,'change', renderLog); on(filterSeason,'change', renderLog); on(filterDesigner,'change', renderLog); on(document.getElementById('filterDatePreset'),'change', renderLog); on(searchText,'input', renderLog); on($('clearFilters'),'click', ()=>{ if(filterBrand) filterBrand.value=''; if(filterAssort) filterAssort.value=''; if(filterSeason) filterSeason.value=''; if(filterDesigner) filterDesigner.value=''; if(searchText) searchText.value=''; const dp=document.getElementById('filterDatePreset'); if(dp) dp.value=''; renderLog(); }); on($('exportCsv'),'click', exportCSV); on($('exportXlsx'),'click', exportXLS); on(refreshBtn,'click', refreshPreview); on(createBtn,'click', addEntry); on(quickMineBtn,'click', ()=>{ if(!auth.designer){ alert('Zaloguj się.'); return; } if(filterDesigner){ filterDesigner.value=auth.designer; renderLog(); } }); renderLog(); refreshPreview(); updateAuthButtonUI(); if(auth.role==='admin' && openAdminBtn) openAdminBtn.style.display='inline-flex'; if(designerEl){ if(auth.designer){ designerEl.innerHTML = `<option value="${auth.designer}">${auth.designer}</option>`; designerEl.value = auth.designer; designerEl.disabled = true; } else { designerEl.disabled = true; } } rebuildLoginUsers(); if(!(auth.designer||auth.role==='admin') && !sessionStorage.getItem('login_demo_shown')){ sessionStorage.setItem('login_demo_shown','1'); openModal($('loginDialog')); } }
-    init();
-
-    // Bind eye toggles
-    document.addEventListener('click', (e)=>{ const btn = e.target.closest('.pw-toggle'); if(!btn) return; const targetId = btn.getAttribute('data-target'); const inp = document.getElementById(targetId); if(!inp) return; const isPwd = inp.type === 'password'; inp.type = isPwd ? 'text' : 'password'; });
-
-    // Delegacja kopiowania
-    document.addEventListener('click', (e)=>{ const btn=e.target.closest('button'); if(!btn) return; if(btn.dataset.action==='copy'){ const code=btn.dataset.code; navigator.clipboard?.writeText(code).then(()=>{ btn.textContent='Skopiowano'; setTimeout(()=>btn.textContent='Kopiuj',1200); showToast('Skopiowano: '+code); }).catch(()=>{}); }});
-
-    function showToast(msg){ const t=$('toast'); if(!t) return; t.textContent=msg; t.classList.add('show'); clearTimeout(showToast._tid); showToast._tid=setTimeout(()=>t.classList.remove('show'),1600); }
-
-    // ===== TESTS =====
-    const testLog = $('testLog'); const runTests = $('runTests');
-    function tlog(line){ testLog.textContent += line + "\n"; }
-    function pass(name){ tlog('✅ '+name); }
-    function fail(name, err){ tlog('❌ '+name+' → '+(err?.message||String(err))); }
-    function expect(cond, msg){ if(!cond) throw new Error(msg); }
-
-    on(runTests,'click', async ()=>{
-      try{ testLog.textContent='';
-        // 1) SIGNUP → SET PASSWORD → AUTO LOGIN
-        newUserBtn.click(); expect(signupDialog.hasAttribute('open') || signupDialog.classList.contains('_pf'), 'Signup dialog not open');
-        suUser.value='Zuzanna'; suNext.click(); // missing passwords yet -> should open setPwd
-        expect(setPwdDialog.hasAttribute('open') || setPwdDialog.classList.contains('_pf'), 'SetPwd not open'); pass('Signup open + transition to password');
-        newPwdEl.value='haslotestowe'; newPwd2El.value='haslotestowe'; setPwdSave.click();
-        expect(auth.designer==='Zuzanna', 'Auto login failed after password set'); pass('Password set & auto login');
-
-        // 2) CREATE CODE
-        const prevCode = previewEl.textContent; createBtn.click(); expect(previewEl.textContent!==prevCode, 'Code not created'); pass('Create code');
-
-        // 3) LOGIN FLOW (change pwd required path) — reset and require change
-        resetUserPassword('Zuzanna'); setLoggedOut(); authBtn.click(); loginUserEl.value='Zuzanna'; loginPassEl.value='Atlas123'; $('loginSubmit').click(); expect(setPwdDialog.hasAttribute('open') || setPwdDialog.classList.contains('_pf'), 'SetPwd not open after forced reset'); pass('Forced reset path');
-
-        // 4) Admin login
-        setLoggedOut(); authBtn.click(); loginUserEl.value='administrator'; loginPassEl.value='mars'; $('loginSubmit').click(); expect(auth.role==='admin', 'Admin login failed'); pass('Admin login');
-
-        // 5) Eye toggles visible in dark mode (just toggle types)
-        const tmp = document.createElement('input'); tmp.type='password'; tmp.id='tmpEye'; document.body.appendChild(tmp); const btn=document.createElement('button'); btn.className='pw-toggle'; btn.setAttribute('data-target','tmpEye'); document.body.appendChild(btn); btn.click(); expect(document.getElementById('tmpEye').type==='text','Eye toggle failed'); pass('Eye toggle'); btn.remove(); tmp.remove();
-
-        pass('WSZYSTKIE TESTY ZDANE');
-      }catch(e){ fail('Tests', e); }
+    // ===== FLOW: Signup (popup) =====
+    const validUsername = (u)=> /^[a-z][a-z0-9_.\-]{2,31}$/i.test(u);
+    newUserBtn.addEventListener('click', ()=>{
+      suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value='';
+      signupDialog.showModal(); suUser.focus();
     });
-  });
+
+    suNext.addEventListener('click', async ()=>{
+      const id = suUser.value.trim();
+      if(!validUsername(id)){ suError.textContent='Użyj formatu: litera na start, 3–32 znaki (litery/cyfry . _ -)'; suError.style.display='block'; return; }
+      try{
+        const ref = doc(db, 'users', id);
+        const s = await getDoc(ref);
+        if (s.exists()) { suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; }
+        await setDoc(ref, { id, first: suFirst.value.trim()||'', last: suLast.value.trim()||'', pass:'', forceReset:true, role:'user', createdAt: Date.now() });
+        signupDialog.close();
+        setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
+      } catch(e){
+        suError.textContent = 'Nie udało się utworzyć użytkownika.'; suError.style.display='block';
+      }
+    });
+
+    // ===== FLOW: Login / Password =====
+    authBtn.addEventListener('click', ()=>{
+      if(AUTH.user){ AUTH={user:'', role:''}; updateAuthUI(); return; }
+      loginError.style.display='none'; loginPassEl.value=''; loginDialog.showModal();
+    });
+
+    loginSubmit.addEventListener('click', async ()=>{
+      const id = loginUserEl.value; const pass = loginPassEl.value;
+      if (id === 'administrator'){
+        if (pass === 'mars'){ AUTH={ user:id, role:'admin' }; loginDialog.close(); updateAuthUI(); showToast('Zalogowano (admin).'); }
+        else { loginError.style.display='block'; }
+        return;
+      }
+      const s = await getDoc(doc(db,'users',id));
+      if(!s.exists()){ loginError.style.display='block'; return; }
+      const u = s.data();
+      if (u.forceReset){
+        if (pass === 'Atlas123'){
+          loginDialog.close();
+          setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
+        } else {
+          loginError.style.display='block';
+        }
+        return;
+      }
+      const hash = await sha256Hex(pass);
+      if (u.pass === hash){
+        AUTH={ user:id, role:'user' }; loginDialog.close(); updateAuthUI(); showToast('Zalogowano.');
+      } else {
+        loginError.style.display='block';
+      }
+    });
+
+    setPwdSave.addEventListener('click', async ()=>{
+      const u = setPwdDialog.dataset.pendingUser||'';
+      const p1 = newPwd.value; const p2 = newPwd2.value;
+      if (p1.length<8 || p1!==p2){ setPwdError.textContent='Hasła muszą być identyczne i mieć min. 8 znaków.'; setPwdError.style.display='block'; return; }
+      const hash = await sha256Hex(p1);
+      await updateDoc(doc(db,'users',u), { pass: hash, forceReset:false });
+      setPwdDialog.close();
+      AUTH={ user:u, role:'user' }; updateAuthUI(); showToast('Hasło zapisane.');
+    });
+
+    // ===== ADMIN =====
+    openAdmin.addEventListener('click', async ()=>{
+      // prosta lista do resetu haseł
+      const snap = await getDoc(doc(db,'users','administrator')).catch(()=>null);
+      const userOpts = loginUserEl.innerHTML || '';
+      adminList.innerHTML = userOpts
+        .replaceAll('<option','<span class="chip" data-u')
+        .replaceAll('</option>','</span>')
+        .replaceAll('value="','')
+        .replaceAll('">','</span>')
+        .trim();
+      adminList.querySelectorAll('[data-u]').forEach(span=>{
+        const user = span.textContent.trim();
+        if(!user || user==='administrator'){ span.remove(); return; }
+        span.innerHTML = `<strong>${user}</strong> <button class="btn" data-reset="${user}">Reset</button>`;
+      });
+      $('adminDialog').showModal();
+    });
+
+    adminList.addEventListener('click', async (e)=>{
+      const btn = e.target.closest('button[data-reset]');
+      if(!btn) return;
+      const who = btn.getAttribute('data-reset');
+      await updateDoc(doc(db,'users',who), { pass:'', forceReset:true });
+      showToast('Zresetowano hasło: '+who);
+    });
+
+    // ===== Sezony / Podgląd / Subskrypcje =====
+    function buildSeasonsAndPreview(){
+      buildSeasons();
+      computePreview();
+      brandEl.addEventListener('change', computePreview);
+      assortmentEl.addEventListener('change', computePreview);
+      refreshBtn.addEventListener('click', computePreview);
+    }
+
+    // ===== Utwórz kod =====
+    createBtn.addEventListener('click', createCode);
+
+    // ===== Dialog zamykanie =====
+    document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
+
+    // ===== Eye toggles =====
+    document.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.pw-toggle'); if(!btn) return;
+      const id = btn.getAttribute('data-target'); const inp = document.getElementById(id);
+      if(!inp) return; inp.type = (inp.type==='password') ? 'text' : 'password';
+    });
+
+    // ===== Init =====
+    (function init(){
+      buildSeasonsAndPreview();
+      subscribeUsers();
+      subscribeCodes();
+      updateAuthUI();
+      // pokaż login na start (test mode UX)
+      if(!sessionStorage.getItem('login_demo_shown')){
+        sessionStorage.setItem('login_demo_shown','1');
+        loginDialog.showModal();
+      }
+    })();
   </script>
 </body>
 </html>
