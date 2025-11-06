@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore realtime)</title>
+  <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore)</title>
 
-  <!-- WSTRZYKNIĘTE: Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
+  <!-- Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
   <script>
     window.__FIREBASE_CONFIG__ = {
       apiKey: "AIzaSyDd5vjDCwkhSzlcxzmkodc8wpKWW5X8Bdo",
@@ -28,6 +28,7 @@
       --input-bg:#0b1224; --chip:#0c1430; --chip-border:#203055; --table-stripe: rgba(255,255,255,.02);
       --header:#101937; --header-text:#d6e7ff; --glass: rgba(10,16,35,.45); --glass-border: rgba(255,255,255,.06);
       --modal-bg:#0a1327; --modal-border:#274077;
+      --icon:#e9edf3;
     }
     html[data-theme="light"]{
       --bg:#f6f8fc; --bg-elev:#ffffff; --border:#d9e0ee; --muted:#66789b; --text:#0f172a;
@@ -38,6 +39,7 @@
       --input-bg:#ffffff; --chip:#f1f5ff; --chip-border:#d9e0ee; --table-stripe: rgba(2,6,23,.03);
       --header:#eaf1ff; --header-text:#0f172a; --glass: rgba(255,255,255,.65); --glass-border: rgba(2,6,23,.08);
       --modal-bg:#ffffff; --modal-border:#d9e0ee;
+      --icon:#0f172a;
     }
 
     *{box-sizing:border-box}
@@ -67,6 +69,7 @@
       outline:none; transition:border-color .15s, box-shadow .15s, background .15s;
       font-size:14px;
     }
+    select:focus, input:focus, textarea:focus{ box-shadow: var(--focus); border-color: var(--primary-600); }
 
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
@@ -76,6 +79,9 @@
     .btn:active{transform:translateY(1px)}
     .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600)); color:#071019; border-color:#0ea5e9}
     .btn-ghost{background:transparent}
+
+    .themeToggle{ display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border-radius:999px; border:1px solid var(--border); background:var(--bg-elev); cursor:pointer; }
+    .themeToggle svg{ width:16px; height:16px; fill: none; stroke: var(--icon); }
 
     table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
     thead th{position:sticky; top:0; background:var(--header); color:var(--header-text); border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:.5px}
@@ -87,10 +93,21 @@
 
     .pw{position:relative}
     .pw input[type=password], .pw input[type=text]{padding-right:40px}
-    .pw-toggle{position:absolute; right:8px; top:50%; transform:translateY(-50%); border:0; background:transparent; cursor:pointer; padding:4px; color:var(--text)}
-    .pw-toggle:hover{color:var(--text)}
+    .pw-toggle{position:absolute; right:8px; top:50%; transform:translateY(-50%); border:0; background:transparent; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center}
+    .pw-toggle svg{ width:18px; height:18px; fill:none; stroke:var(--icon); stroke-width:2; }
 
     .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-elev);font-size:12px;color:var(--text)}
+
+    /* Dialog (pop-up) – spójny z Dark/Light, bez białej obwódki */
+    dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:460px }
+    dialog::backdrop{background:rgba(0,0,0,.45)}
+    dialog:focus{ outline: none; }
+    dialog:focus-visible{ outline: none; }
+    dialog[open]{ display:block; }
+    .modal-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--header)}
+    .modal-title{margin:0;font-size:14px;text-transform:uppercase;color:var(--header-text)}
+    .modal-body{padding:12px}
+    .modal-actions{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px;border-top:1px solid var(--border)}
   </style>
 </head>
 <body>
@@ -98,9 +115,14 @@
     <div class="header-inner">
       <div>
         <h1 class="appTitle">GENERATOR KODÓW <span class="brand">ESOTIQ & HENDERSON</span></h1>
-        <p class="subtitle">Współdzielone online (Firestore, realtime) — trwałe logowanie</p>
+        <p class="subtitle">Współdzielone online (Firestore, realtime) — Dark/Light + trwałe logowanie</p>
       </div>
       <div style="display:flex; gap:8px; align-items:center">
+        <button id="themeBtn" class="themeToggle" type="button" aria-label="Przełącz motyw">
+          <svg id="iconSun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4 12H2M22 12h-2M5 5l-1.5-1.5M20.5 20.5L19 19M5 19l-1.5 1.5M20.5 3.5L19 5"></path></svg>
+          <svg id="iconMoon" viewBox="0 0 24 24" style="display:none"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+          <span id="themeLabel">Light</span>
+        </button>
         <span id="envBadge" class="badge">ENV: …</span>
         <span id="loggedBadge" class="badge" style="display:none"></span>
         <button id="newUserBtn" class="btn" type="button">➕ Nowy użytkownik</button>
@@ -199,10 +221,10 @@
       <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
     </div>
     <div class="modal-body">
-      <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. zuza.kowalska" /></div>
+      <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. zuza.kowalska" required /></div>
       <div class="row" style="margin-top:8px">
-        <div class="control"><label>Imię (opcjonalnie)</label><input id="suFirst" type="text" /></div>
-        <div class="control"><label>Nazwisko (opcjonalnie)</label><input id="suLast" type="text" /></div>
+        <div class="control"><label>Imię <span style="color:var(--danger)">*</span></label><input id="suFirst" type="text" required /></div>
+        <div class="control"><label>Nazwisko <span style="color:var(--danger)">*</span></label><input id="suLast" type="text" required /></div>
       </div>
       <div id="suError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div>
     </div>
@@ -219,7 +241,18 @@
     </div>
     <div class="modal-body">
       <div class="control"><label>Użytkownik</label><select id="loginUser"></select></div>
-      <div class="control" style="margin-top:8px"><label>Hasło</label><div class="pw"><input id="loginPass" type="password" placeholder="Wpisz hasło" /><button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
+      <div class="control" style="margin-top:8px">
+        <label>Hasło</label>
+        <div class="pw">
+          <input id="loginPass" type="password" placeholder="Wpisz hasło" />
+          <button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło">
+            <!-- Oko zamknięte (domyślnie) -->
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <!-- Oko otwarte -->
+            <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+      </div>
       <div id="loginError" class="hint" style="color:#fca5a5; display:none; margin-top:6px">Błędne dane logowania.</div>
     </div>
     <div class="modal-actions">
@@ -234,8 +267,26 @@
     </div>
     <div class="modal-body">
       <p class="hint">Hasło: min. 8 znaków</p>
-      <div class="control"><label>Nowe hasło</label><div class="pw"><input id="newPwd" type="password" maxlength="64" /><button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
-      <div class="control"><label>Powtórz hasło</label><div class="pw"><input id="newPwd2" type="password" maxlength="64" /><button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło">👁</button></div></div>
+      <div class="control">
+        <label>Nowe hasło</label>
+        <div class="pw">
+          <input id="newPwd" type="password" maxlength="64" />
+          <button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło">
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+      </div>
+      <div class="control">
+        <label>Powtórz hasło</label>
+        <div class="pw">
+          <input id="newPwd2" type="password" maxlength="64" />
+          <button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło">
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+          </button>
+        </div>
+      </div>
       <div id="setPwdError" class="hint" style="color:#fca5a5; display:none; margin-top:6px"></div>
     </div>
     <div class="modal-actions">
@@ -261,12 +312,38 @@
 
     // ===== DOM =====
     const $ = id => document.getElementById(id);
+    const themeBtn = $('themeBtn'); const themeLabel = $('themeLabel');
+    const iconSun = $('iconSun'); const iconMoon = $('iconMoon');
     const envBadge = $('envBadge'); const toast = $('toast');
     const brandEl = $('brand'); const assortmentEl = $('assortment'); const designerEl = $('designer'); const seasonEl = $('season'); const collectionEl = $('collection'); const previewEl = $('preview'); const refreshBtn = $('refresh'); const createBtn = $('create'); const logBody = $('logBody');
     const newUserBtn = $('newUserBtn'); const signupDialog = $('signupDialog'); const suUser = $('suUser'); const suFirst = $('suFirst'); const suLast = $('suLast'); const suError = $('suError'); const suNext = $('suNext');
     const loginDialog = $('loginDialog'); const loginUserEl = $('loginUser'); const loginPassEl = $('loginPass'); const loginError = $('loginError'); const loginSubmit = $('loginSubmit');
     const setPwdDialog = $('setPwdDialog'); const newPwd = $('newPwd'); const newPwd2 = $('newPwd2'); const setPwdError = $('setPwdError'); const setPwdSave = $('setPwdSave');
     const authBtn = $('authBtn'); const authLabel = $('authLabel'); const openAdmin = $('openAdmin'); const adminList = $('adminList'); const loggedBadge = $('loggedBadge');
+
+    // ===== THEME (persist) =====
+    const THEME_KEY='gh_theme_v1';
+    function setTheme(t){
+      document.documentElement.setAttribute('data-theme', t);
+      const light = t==='light';
+      iconSun.style.display = light ? 'none' : '';
+      iconMoon.style.display = light ? '' : 'none';
+      themeLabel.textContent = light ? 'Dark' : 'Light';
+      localStorage.setItem(THEME_KEY, t);
+    }
+    function initTheme(){
+      const saved = localStorage.getItem(THEME_KEY);
+      if(saved==='light' || saved==='dark'){ setTheme(saved); }
+      else {
+        // prefer-color-scheme jako start
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'light');
+      }
+    }
+    themeBtn.addEventListener('click', ()=>{
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      setTheme(cur==='dark' ? 'light' : 'dark');
+    });
 
     // ===== UTIL =====
     const pad3 = n => String(n).padStart(3,'0');
@@ -277,7 +354,7 @@
     const AUTH_KEY = 'gh_auth_v1';
     const loadAuth = ()=>{ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)) || {user:'',role:''}; }catch{ return {user:'',role:''}; } };
     const saveAuth = (auth)=>{ localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); };
-    let AUTH = loadAuth(); // wczytaj zapisany stan
+    let AUTH = loadAuth();
 
     // ===== Konfiguracja i inicjalizacja Firebase =====
     const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
@@ -317,7 +394,6 @@
         const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
         loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
 
-        // Seed (tylko jeśli pusto) — wygodne przy pierwszym uruchomieniu
         if (arr.length === 0) {
           (async ()=>{
             const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
@@ -333,9 +409,7 @@
     // ===== Realtime: Codes =====
     function toJsDate(ts){
       if (!ts) return new Date();
-      // Firestore Timestamp ma met. toDate()
       if (typeof ts.toDate === 'function') return ts.toDate();
-      // fallback dla liczb/ISO:
       if (typeof ts === 'number') return new Date(ts);
       if (typeof ts === 'string') return new Date(ts);
       return new Date();
@@ -411,12 +485,22 @@
 
     suNext.addEventListener('click', async ()=>{
       const id = suUser.value.trim();
-      if(!validUsername(id)){ suError.textContent='Użyj formatu: litera na start, 3–32 znaki (litery/cyfry . _ -)'; suError.style.display='block'; return; }
+      const first = suFirst.value.trim();
+      const last = suLast.value.trim();
+
+      if(!validUsername(id)){
+        suError.textContent='Użyj formatu nazwy: litera na start, 3–32 znaki (litery/cyfry . _ -)';
+        suError.style.display='block'; return;
+      }
+      if(first.length===0 || last.length===0){
+        suError.textContent='Imię i nazwisko są obowiązkowe.';
+        suError.style.display='block'; return;
+      }
       try{
         const ref = doc(db, 'users', id);
         const s = await getDoc(ref);
         if (s.exists()) { suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; }
-        await setDoc(ref, { id, first: suFirst.value.trim()||'', last: suLast.value.trim()||'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
+        await setDoc(ref, { id, first, last, pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
         signupDialog.close();
         setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
       } catch(e){
@@ -510,15 +594,26 @@
     // ===== Dialog zamykanie =====
     document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
 
-    // ===== Eye toggles =====
+    // ===== Eye toggles (jedna ikona, zmienia się) =====
+    function toggleEye(btn, visible){
+      const svgClosed = btn.querySelector('svg[data-eye="closed"]');
+      const svgOpen = btn.querySelector('svg[data-eye="open"]');
+      if(!svgClosed || !svgOpen) return;
+      svgClosed.style.display = visible ? 'none' : '';
+      svgOpen.style.display   = visible ? '' : 'none';
+    }
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.pw-toggle'); if(!btn) return;
       const id = btn.getAttribute('data-target'); const inp = document.getElementById(id);
-      if(!inp) return; inp.type = (inp.type==='password') ? 'text' : 'password';
+      if(!inp) return;
+      const nowVisible = (inp.type === 'password');
+      inp.type = nowVisible ? 'text' : 'password';
+      toggleEye(btn, nowVisible);
     });
 
     // ===== Init =====
     (function init(){
+      initTheme();
       buildSeasonsAndPreview();
       subscribeUsers();
       subscribeCodes();
