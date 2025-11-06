@@ -5,6 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore)</title>
 
+  <!-- USTAW MOTYW PRZED PIERWSZYM RENDEREM (bez mignięć) -->
+  <script>
+    (function(){
+      try {
+        const k='gh_theme_v1';
+        const saved=localStorage.getItem(k);
+        const t = (saved==='light'||saved==='dark') ? saved :
+                  (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', t);
+      } catch(_) {}
+    })();
+  </script>
+
   <!-- Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
   <script>
     window.__FIREBASE_CONFIG__ = {
@@ -101,8 +114,7 @@
     /* Dialog (pop-up) – spójny z Dark/Light, bez białej obwódki */
     dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:460px }
     dialog::backdrop{background:rgba(0,0,0,.45)}
-    dialog:focus{ outline: none; }
-    dialog:focus-visible{ outline: none; }
+    dialog:focus, dialog:focus-visible{ outline: none; }
     dialog[open]{ display:block; }
     .modal-header{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--border);background:var(--header)}
     .modal-title{margin:0;font-size:14px;text-transform:uppercase;color:var(--header-text)}
@@ -218,7 +230,7 @@
   <dialog id="signupDialog">
     <div class="modal-header">
       <h3 class="modal-title">Nowy użytkownik</h3>
-      <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
+      <!-- brak przycisku 'Zamknij' tutaj zgodnie z wymaganiami -->
     </div>
     <div class="modal-body">
       <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. zuza.kowalska" required /></div>
@@ -237,7 +249,7 @@
   <dialog id="loginDialog">
     <div class="modal-header">
       <h3 class="modal-title">Logowanie</h3>
-      <button class="btn btn-ghost" type="button" data-close>Zamknij</button>
+      <!-- usunięto przycisk 'Zamknij'; 'Anuluj' zamyka okno -->
     </div>
     <div class="modal-body">
       <div class="control"><label>Użytkownik</label><select id="loginUser"></select></div>
@@ -247,7 +259,7 @@
           <input id="loginPass" type="password" placeholder="Wpisz hasło" />
           <button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło">
             <!-- Oko zamknięte (domyślnie) -->
-            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
             <!-- Oko otwarte -->
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
@@ -272,7 +284,7 @@
         <div class="pw">
           <input id="newPwd" type="password" maxlength="64" />
           <button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło">
-            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
         </div>
@@ -282,7 +294,7 @@
         <div class="pw">
           <input id="newPwd2" type="password" maxlength="64" />
           <button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło">
-            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10.58 10.58A3 3 0 0 0 12 15a3 3 0 0 0 2.42-4.42M9.88 5.088A10.36 10.36 0 0 1 12 5c5 0 9 4.5 10 7- .27.6-.66 1.23-1.14 1.86M6.23 6.23C4.23 7.46 2.86 9.06 2 12c.38.85.88 1.65 1.49 2.39"></path></svg>
+            <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
         </div>
@@ -296,7 +308,7 @@
   </dialog>
 
   <dialog id="adminDialog">
-    <div class="modal-header"><h3 class="modal-title">Panel administratora</h3><button class="btn btn-ghost" type="button" data-close>Zamknij</button></div>
+    <div class="modal-header"><h3 class="modal-title">Panel administratora</h3></div>
     <div class="modal-body"><p class="hint">Zresetuj hasło użytkownika (ustawi puste hasło i wymusi zmianę przy następnym logowaniu).</p><div id="adminList" class="chips" style="margin-top:8px"></div></div>
     <div class="modal-actions"><button class="btn" type="button" data-close>Zamknij</button></div>
   </dialog>
@@ -321,7 +333,7 @@
     const setPwdDialog = $('setPwdDialog'); const newPwd = $('newPwd'); const newPwd2 = $('newPwd2'); const setPwdError = $('setPwdError'); const setPwdSave = $('setPwdSave');
     const authBtn = $('authBtn'); const authLabel = $('authLabel'); const openAdmin = $('openAdmin'); const adminList = $('adminList'); const loggedBadge = $('loggedBadge');
 
-    // ===== THEME (persist) =====
+    // ===== THEME (persist + UI) =====
     const THEME_KEY='gh_theme_v1';
     function setTheme(t){
       document.documentElement.setAttribute('data-theme', t);
@@ -329,17 +341,17 @@
       iconSun.style.display = light ? 'none' : '';
       iconMoon.style.display = light ? '' : 'none';
       themeLabel.textContent = light ? 'Dark' : 'Light';
-      localStorage.setItem(THEME_KEY, t);
+      try { localStorage.setItem(THEME_KEY, t); } catch(_) {}
     }
-    function initTheme(){
-      const saved = localStorage.getItem(THEME_KEY);
-      if(saved==='light' || saved==='dark'){ setTheme(saved); }
-      else {
-        // prefer-color-scheme jako start
-        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'dark' : 'light');
+    (function initTheme(){
+      try{
+        const saved = localStorage.getItem(THEME_KEY);
+        const t = (saved==='light'||saved==='dark') ? saved : document.documentElement.getAttribute('data-theme') || 'dark';
+        setTheme(t);
+      } catch(_){
+        setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
       }
-    }
+    })();
     themeBtn.addEventListener('click', ()=>{
       const cur = document.documentElement.getAttribute('data-theme') || 'dark';
       setTheme(cur==='dark' ? 'light' : 'dark');
@@ -353,7 +365,7 @@
     // ===== PERSIST AUTH (trwałe logowanie) =====
     const AUTH_KEY = 'gh_auth_v1';
     const loadAuth = ()=>{ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)) || {user:'',role:''}; }catch{ return {user:'',role:''}; } };
-    const saveAuth = (auth)=>{ localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); };
+    const saveAuth = (auth)=>{ try{ localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); }catch{} };
     let AUTH = loadAuth();
 
     // ===== Konfiguracja i inicjalizacja Firebase =====
@@ -363,14 +375,13 @@
 
     envBadge.textContent = 'ENV: FIREBASE (online, współdzielone — realtime)';
 
-    // ===== MAPPINGI =====
+    // ===== MAPY / STAN UŻYTKOWNIKÓW =====
     const BRAND_MAP = { ES:'Esotiq', HE:'Henderson', BV:'Bloovii', HL:'Henderson Ladies' };
     const ASSORTMENT_MAP = { PR:'PRINT', PT:'PATTERN', EM:'EMBROIDERY', RB:'RUBBER', TP:'TAPE', AP:'APPLICATION', LB:'LABEL', HG:'HANGTAG', BX:'BOX', PC:'SOCKS PACKING', ST:'PRICE STICKER', FAN:'MISCELLANEOUS', BT:'BUTTON', HAN:'HANGER PRINT', WCL:'WASHING LABEL' };
-
-    // ===== Kolekcje / dokumenty =====
     const usersCol = collection(db, 'users');
     const codesCol = collection(db, 'codes');
     const countersDoc = doc(db, 'meta', 'counters');
+    const USERS = new Map(); // id -> {first, last, ...}
 
     // ===== UI AUTH =====
     function updateAuthUI(){
@@ -387,18 +398,21 @@
       }
     }
 
-    // ===== Realtime: Users =====
+    // ===== Realtime: Users (i budowa mapy do pełnych nazw) =====
+    function fullName(u){ return [u.first||'', u.last||''].filter(Boolean).join(' ').trim(); }
     function subscribeUsers(){
       const qUsers = query(usersCol, orderBy('id'));
       onSnapshot(qUsers, snap=>{
         const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        USERS.clear();
+        arr.forEach(u=> USERS.set(u.id, u));
         loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
-
+        // seed jeśli pusto
         if (arr.length === 0) {
           (async ()=>{
             const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
             for (const u of seed) {
-              await setDoc(doc(db,'users',u), { id:u, first:'', last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
+              await setDoc(doc(db,'users',u), { id:u, first:u, last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
             }
             await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: serverTimestamp() });
           })().catch(console.error);
@@ -406,7 +420,7 @@
       }, err => console.error('users onSnapshot error', err));
     }
 
-    // ===== Realtime: Codes =====
+    // ===== Realtime: Codes (pokazuj pełne imię+nazwisko) =====
     function toJsDate(ts){
       if (!ts) return new Date();
       if (typeof ts.toDate === 'function') return ts.toDate();
@@ -414,7 +428,11 @@
       if (typeof ts === 'string') return new Date(ts);
       return new Date();
     }
-
+    function designerDisplay(item){
+      if (item.designerName) return item.designerName;
+      const u = USERS.get(item.designer);
+      return u ? fullName(u) || item.designer : item.designer;
+    }
     function subscribeCodes(){
       const qCodes = query(codesCol, orderBy('createdAt', 'asc'));
       onSnapshot(qCodes, snap=>{
@@ -427,7 +445,7 @@
             <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
             <td>${BRAND_MAP[item.brand]||item.brand}</td>
             <td>${item.season}</td>
-            <td>${item.designer}</td>
+            <td>${designerDisplay(item)}</td>
             <td>${item.collection||''}</td>
             <td>${dt.toLocaleString()}</td>`;
           logBody.appendChild(tr);
@@ -453,7 +471,7 @@
       previewEl.textContent = `${a}_${b}…`; // finalny numer nada transakcja
     }
 
-    // ===== Transakcja licznika + zapis kodu =====
+    // ===== Transakcja licznika + zapis kodu (z designerName) =====
     async function createCode(){
       if(!AUTH.user || AUTH.role!=='user'){ alert('Zaloguj się jako projektant/ka.'); return; }
       const a = assortmentEl.value; const b = brandEl.value; const s = seasonEl.value; const coll = (collectionEl.value||'').trim();
@@ -468,7 +486,14 @@
       });
 
       const code = `${a}_${b}${pad3(seq)}`;
-      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, collection:coll, createdAt: serverTimestamp() };
+      const u = USERS.get(AUTH.user) || {};
+      const entry = {
+        code, assortment:a, brand:b, season:s,
+        designer: AUTH.user,
+        designerName: fullName(u) || AUTH.user,   // << zapis pełnej nazwy
+        collection: coll,
+        createdAt: serverTimestamp()
+      };
       await addDoc(codesCol, entry);
 
       await computePreview();
@@ -476,7 +501,7 @@
       try{ await navigator.clipboard.writeText(code); }catch{}
     }
 
-    // ===== FLOW: Signup (popup) =====
+    // ===== FLOW: Signup (wymagane imię+nazwisko) =====
     const validUsername = (u)=> /^[a-z][a-z0-9_.\-]{2,31}$/i.test(u);
     newUserBtn.addEventListener('click', ()=>{
       suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value='';
@@ -509,6 +534,7 @@
     });
 
     // ===== FLOW: Login / Password =====
+    const AUTH_KEY_STORAGE = 'gh_auth_v1';
     function setLoggedIn(u, role){ AUTH={user:u, role}; saveAuth(AUTH); updateAuthUI(); showToast('Zalogowano.'); }
     function setLoggedOut(){ AUTH={user:'', role:''}; saveAuth(AUTH); updateAuthUI(); showToast('Wylogowano.'); }
 
@@ -516,6 +542,9 @@
       if(AUTH.user){ setLoggedOut(); return; }
       loginError.style.display='none'; loginPassEl.value=''; loginDialog.showModal();
     });
+
+    // „Anuluj” zamyka pop-upy
+    document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
 
     loginSubmit.addEventListener('click', async ()=>{
       const id = loginUserEl.value; const pass = loginPassEl.value;
@@ -556,18 +585,8 @@
 
     // ===== ADMIN (reset hasła) =====
     openAdmin.addEventListener('click', async ()=>{
-      const userOpts = loginUserEl.innerHTML || '';
-      adminList.innerHTML = userOpts
-        .replaceAll('<option','<span class="chip" data-u')
-        .replaceAll('</option>','</span>')
-        .replaceAll('value="','')
-        .replaceAll('">','</span>')
-        .trim();
-      adminList.querySelectorAll('[data-u]').forEach(span=>{
-        const user = span.textContent.trim();
-        if(!user || user==='administrator'){ span.remove(); return; }
-        span.innerHTML = `<strong>${user}</strong> <button class="btn" data-reset="${user}">Reset</button>`;
-      });
+      const optionsHTML = Array.from(USERS.keys()).map(u=>`<span class="chip" data-u="${u}"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`).join('');
+      adminList.innerHTML = optionsHTML;
       $('adminDialog').showModal();
     });
 
@@ -591,9 +610,6 @@
     // ===== Utwórz kod =====
     createBtn.addEventListener('click', createCode);
 
-    // ===== Dialog zamykanie =====
-    document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
-
     // ===== Eye toggles (jedna ikona, zmienia się) =====
     function toggleEye(btn, visible){
       const svgClosed = btn.querySelector('svg[data-eye="closed"]');
@@ -613,18 +629,11 @@
 
     // ===== Init =====
     (function init(){
-      initTheme();
       buildSeasonsAndPreview();
       subscribeUsers();
       subscribeCodes();
       updateAuthUI();
-
-      // pokaż login tylko jeśli nie byliśmy zalogowani
-      const wasLogged = !!AUTH.user;
-      if(!wasLogged && !sessionStorage.getItem('login_demo_shown')){
-        sessionStorage.setItem('login_demo_shown','1');
-        loginDialog.showModal();
-      }
+      // nie pokazujemy auto-logowania; stan trzymany w localStorage
     })();
   </script>
 </body>
