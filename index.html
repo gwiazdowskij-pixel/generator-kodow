@@ -5,20 +5,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>GENERATOR KODÓW ESOTIQ & HENDERSON — ONLINE (Firestore)</title>
 
-  <!-- USTAW MOTYW PRZED PIERWSZYM RENDEREM (bez mignięć) -->
+  <!-- USTAW MOTYW PRZED PIERWSZYM RENDEREM -->
   <script>
     (function(){
-      try {
+      try{
         const k='gh_theme_v1';
         const saved=localStorage.getItem(k);
-        const t = (saved==='light'||saved==='dark') ? saved :
-                  (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-        document.documentElement.setAttribute('data-theme', t);
-      } catch(_) {}
+        const t=(saved==='light'||saved==='dark')?saved:(matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');
+        document.documentElement.setAttribute('data-theme',t);
+      }catch(_){}
     })();
   </script>
 
-  <!-- Twoja konfiguracja Firebase (TYLKO wymagane pola) -->
+  <!-- Firebase config (tylko wymagane pola) -->
   <script>
     window.__FIREBASE_CONFIG__ = {
       apiKey: "AIzaSyDd5vjDCwkhSzlcxzmkodc8wpKWW5X8Bdo",
@@ -32,6 +31,8 @@
 
   <style>
     :root{ color-scheme: light dark; }
+
+    /* DARK */
     html[data-theme="dark"]{
       --bg:#0b1020; --bg-elev:#0f152a; --border:#1c2540; --muted:#9fb0c6; --text:#e9edf3;
       --primary:#7dd3fc; --primary-600:#38bdf8; --success:#22c55e; --danger:#f43f5e;
@@ -42,7 +43,19 @@
       --header:#101937; --header-text:#d6e7ff; --glass: rgba(10,16,35,.45); --glass-border: rgba(255,255,255,.06);
       --modal-bg:#0a1327; --modal-border:#274077;
       --icon:#e9edf3;
+
+      /* przyciski */
+      --btn-bg: linear-gradient(180deg,#111a37,#0e152c);
+      --btn-bg-hover: linear-gradient(180deg,#132045,#0e152c);
+      --btn-border:#2c3e6c;
+      --btn-text: var(--text);
+
+      --btnp-bg: linear-gradient(180deg,var(--primary),var(--primary-600));
+      --btnp-border:#0ea5e9;
+      --btnp-text:#071019;
     }
+
+    /* LIGHT */
     html[data-theme="light"]{
       --bg:#f6f8fc; --bg-elev:#ffffff; --border:#d9e0ee; --muted:#66789b; --text:#0f172a;
       --primary:#0ea5e9; --primary-600:#0284c7; --success:#16a34a; --danger:#dc2626;
@@ -53,6 +66,16 @@
       --header:#eaf1ff; --header-text:#0f172a; --glass: rgba(255,255,255,.65); --glass-border: rgba(2,6,23,.08);
       --modal-bg:#ffffff; --modal-border:#d9e0ee;
       --icon:#0f172a;
+
+      /* przyciski */
+      --btn-bg: linear-gradient(180deg,#ffffff,#f3f7ff);
+      --btn-bg-hover: linear-gradient(180deg,#f9fbff,#eef3ff);
+      --btn-border:#c7d2fe;
+      --btn-text:#0f172a;
+
+      --btnp-bg: linear-gradient(180deg,#38bdf8,#0ea5e9);
+      --btnp-border:#0ea5e9;
+      --btnp-text:#06121e;
     }
 
     *{box-sizing:border-box}
@@ -87,14 +110,26 @@
     .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
     .row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 
-    .btn{appearance:none; border:1px solid var(--border); background:linear-gradient(180deg,#111a37,#0e152c); color:var(--text); padding:10px 14px; border-radius:12px; cursor:pointer; font-weight:650; transition:transform .06s, background .18s, border-color .18s; display:inline-flex; align-items:center; gap:8px; font-size:14px}
-    .btn:hover{background:linear-gradient(180deg,#132045,#0e152c); border-color:#2c3e6c}
-    .btn:active{transform:translateY(1px)}
-    .btn-primary{background:linear-gradient(180deg,var(--primary),var(--primary-600)); color:#071019; border-color:#0ea5e9}
-    .btn-ghost{background:transparent}
+    .btn{
+      appearance:none; border:1px solid var(--btn-border);
+      background:var(--btn-bg); color:var(--btn-text);
+      padding:10px 14px; border-radius:12px; cursor:pointer;
+      font-weight:650; transition:transform .06s, background .18s, border-color .18s;
+      display:inline-flex; align-items:center; gap:8px; font-size:14px
+    }
+    .btn:hover{ background:var(--btn-bg-hover); }
+    .btn:active{ transform:translateY(1px) }
+    .btn-primary{
+      background:var(--btnp-bg); color:var(--btnp-text); border-color:var(--btnp-border)
+    }
+    .btn-ghost{ background:transparent }
 
-    .themeToggle{ display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border-radius:999px; border:1px solid var(--border); background:var(--bg-elev); cursor:pointer; }
-    .themeToggle svg{ width:16px; height:16px; fill: none; stroke: var(--icon); }
+    .themeToggle{
+      display:inline-flex; align-items:center; gap:6px; padding:8px 10px; border-radius:999px;
+      border:1px solid var(--border); background:var(--bg-elev); cursor:pointer; color:var(--text);
+    }
+    .themeToggle svg{ width:16px; height:16px; fill:none; stroke: var(--icon); }
+    .themeToggle span{ color:var(--text); }
 
     table{width:100%; border-collapse:separate; border-spacing:0; table-layout:auto}
     thead th{position:sticky; top:0; background:var(--header); color:var(--header-text); border-bottom:1px solid var(--border); font-size:12px; text-transform:uppercase; letter-spacing:.5px}
@@ -109,9 +144,14 @@
     .pw-toggle{position:absolute; right:8px; top:50%; transform:translateY(-50%); border:0; background:transparent; cursor:pointer; padding:4px; display:inline-flex; align-items:center; justify-content:center}
     .pw-toggle svg{ width:18px; height:18px; fill:none; stroke:var(--icon); stroke-width:2; }
 
+    /* ukryj natywne 'eye' i 'clear' (Edge) — zapobiega drugiej ikonie */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear{ display:none; }
+    input::-ms-reveal{ display:none; }
+
     .badge{display:inline-flex;align-items:center;gap:6px;padding:6px 10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-elev);font-size:12px;color:var(--text)}
 
-    /* Dialog (pop-up) – spójny z Dark/Light, bez białej obwódki */
+    /* Dialog (pop-up) */
     dialog{ border:1px solid var(--modal-border); border-radius:12px; background:var(--modal-bg); color:var(--text); padding:0; box-shadow:var(--shadow); max-width:460px }
     dialog::backdrop{background:rgba(0,0,0,.45)}
     dialog:focus, dialog:focus-visible{ outline: none; }
@@ -226,11 +266,10 @@
 
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
-  <!-- DIALOGI (pop-up) -->
+  <!-- DIALOGI -->
   <dialog id="signupDialog">
     <div class="modal-header">
       <h3 class="modal-title">Nowy użytkownik</h3>
-      <!-- brak przycisku 'Zamknij' tutaj zgodnie z wymaganiami -->
     </div>
     <div class="modal-body">
       <div class="control"><label>Nazwa użytkownika</label><input id="suUser" type="text" placeholder="np. zuza.kowalska" required /></div>
@@ -249,7 +288,6 @@
   <dialog id="loginDialog">
     <div class="modal-header">
       <h3 class="modal-title">Logowanie</h3>
-      <!-- usunięto przycisk 'Zamknij'; 'Anuluj' zamyka okno -->
     </div>
     <div class="modal-body">
       <div class="control"><label>Użytkownik</label><select id="loginUser"></select></div>
@@ -258,9 +296,7 @@
         <div class="pw">
           <input id="loginPass" type="password" placeholder="Wpisz hasło" />
           <button type="button" class="pw-toggle" data-target="loginPass" aria-label="Pokaż/ukryj hasło">
-            <!-- Oko zamknięte (domyślnie) -->
             <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
-            <!-- Oko otwarte -->
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
           </button>
         </div>
@@ -274,15 +310,13 @@
   </dialog>
 
   <dialog id="setPwdDialog">
-    <div class="modal-header">
-      <h3 class="modal-title">Ustaw nowe hasło</h3>
-    </div>
+    <div class="modal-header"><h3 class="modal-title">Ustaw nowe hasło</h3></div>
     <div class="modal-body">
       <p class="hint">Hasło: min. 8 znaków</p>
       <div class="control">
         <label>Nowe hasło</label>
         <div class="pw">
-          <input id="newPwd" type="password" maxlength="64" />
+          <input id="newPwd" type="password" maxlength="64" autocomplete="new-password" />
           <button type="button" class="pw-toggle" data-target="newPwd" aria-label="Pokaż/ukryj hasło">
             <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -292,7 +326,7 @@
       <div class="control">
         <label>Powtórz hasło</label>
         <div class="pw">
-          <input id="newPwd2" type="password" maxlength="64" />
+          <input id="newPwd2" type="password" maxlength="64" autocomplete="new-password" />
           <button type="button" class="pw-toggle" data-target="newPwd2" aria-label="Pokaż/ukryj hasło">
             <svg data-eye="closed" viewBox="0 0 24 24"><path d="M3 3l18 18"></path><path d="M10 4.5c.65-.33 1.35-.5 2-.5 7 0 11 7 11 7a17.9 17.9 0 0 1-2.1 2.79M2 12s1.37-2.6 3.9-4.67M12 9a3 3 0 0 0-3 3"></path></svg>
             <svg data-eye="open" viewBox="0 0 24 24" style="display:none"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
@@ -314,7 +348,6 @@
   </dialog>
 
   <script type="module">
-    // ===== Firebase (ESM z CDN) =====
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import {
       getFirestore, doc, getDoc, setDoc, updateDoc,
@@ -322,7 +355,6 @@
       serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
-    // ===== DOM =====
     const $ = id => document.getElementById(id);
     const themeBtn = $('themeBtn'); const themeLabel = $('themeLabel');
     const iconSun = $('iconSun'); const iconMoon = $('iconMoon');
@@ -333,7 +365,7 @@
     const setPwdDialog = $('setPwdDialog'); const newPwd = $('newPwd'); const newPwd2 = $('newPwd2'); const setPwdError = $('setPwdError'); const setPwdSave = $('setPwdSave');
     const authBtn = $('authBtn'); const authLabel = $('authLabel'); const openAdmin = $('openAdmin'); const adminList = $('adminList'); const loggedBadge = $('loggedBadge');
 
-    // ===== THEME (persist + UI) =====
+    /* THEME */
     const THEME_KEY='gh_theme_v1';
     function setTheme(t){
       document.documentElement.setAttribute('data-theme', t);
@@ -341,49 +373,47 @@
       iconSun.style.display = light ? 'none' : '';
       iconMoon.style.display = light ? '' : 'none';
       themeLabel.textContent = light ? 'Dark' : 'Light';
-      try { localStorage.setItem(THEME_KEY, t); } catch(_) {}
+      try{ localStorage.setItem(THEME_KEY, t); }catch(_){}
     }
     (function initTheme(){
       try{
         const saved = localStorage.getItem(THEME_KEY);
-        const t = (saved==='light'||saved==='dark') ? saved : document.documentElement.getAttribute('data-theme') || 'dark';
+        const t=(saved==='light'||saved==='dark')?saved:(document.documentElement.getAttribute('data-theme')||'dark');
         setTheme(t);
-      } catch(_){
-        setTheme(document.documentElement.getAttribute('data-theme') || 'dark');
-      }
+      }catch(_){ setTheme(document.documentElement.getAttribute('data-theme')||'dark'); }
     })();
     themeBtn.addEventListener('click', ()=>{
-      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
-      setTheme(cur==='dark' ? 'light' : 'dark');
+      const cur=document.documentElement.getAttribute('data-theme')||'dark';
+      setTheme(cur==='dark'?'light':'dark');
     });
 
-    // ===== UTIL =====
+    /* UTIL */
     const pad3 = n => String(n).padStart(3,'0');
     const sha256Hex = async (text)=>{ const enc = new TextEncoder().encode(text); const buf = await crypto.subtle.digest('SHA-256', enc); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); };
     const showToast = (m)=>{ if(!toast) return; toast.textContent = m; toast.classList.add('show'); clearTimeout(showToast._t); showToast._t = setTimeout(()=>toast.classList.remove('show'),1600); };
 
-    // ===== PERSIST AUTH (trwałe logowanie) =====
-    const AUTH_KEY = 'gh_auth_v1';
+    /* AUTH PERSIST */
+    const AUTH_KEY='gh_auth_v1';
     const loadAuth = ()=>{ try{ return JSON.parse(localStorage.getItem(AUTH_KEY)) || {user:'',role:''}; }catch{ return {user:'',role:''}; } };
     const saveAuth = (auth)=>{ try{ localStorage.setItem(AUTH_KEY, JSON.stringify(auth)); }catch{} };
     let AUTH = loadAuth();
 
-    // ===== Konfiguracja i inicjalizacja Firebase =====
-    const firebaseConfig = window.__FIREBASE_CONFIG__ || {};
-    const app = initializeApp(firebaseConfig);
+    /* Firebase */
+    const app = initializeApp(window.__FIREBASE_CONFIG__||{});
     const db  = getFirestore(app);
-
     envBadge.textContent = 'ENV: FIREBASE (online, współdzielone — realtime)';
 
-    // ===== MAPY / STAN UŻYTKOWNIKÓW =====
+    /* MAPY / STAN */
     const BRAND_MAP = { ES:'Esotiq', HE:'Henderson', BV:'Bloovii', HL:'Henderson Ladies' };
     const ASSORTMENT_MAP = { PR:'PRINT', PT:'PATTERN', EM:'EMBROIDERY', RB:'RUBBER', TP:'TAPE', AP:'APPLICATION', LB:'LABEL', HG:'HANGTAG', BX:'BOX', PC:'SOCKS PACKING', ST:'PRICE STICKER', FAN:'MISCELLANEOUS', BT:'BUTTON', HAN:'HANGER PRINT', WCL:'WASHING LABEL' };
     const usersCol = collection(db, 'users');
     const codesCol = collection(db, 'codes');
     const countersDoc = doc(db, 'meta', 'counters');
-    const USERS = new Map(); // id -> {first, last, ...}
 
-    // ===== UI AUTH =====
+    const USERS = new Map();   // id -> user data
+    let LAST_CODES = [];       // ostatnie pobrane dokumenty 'codes'
+
+    /* AUTH UI */
     function updateAuthUI(){
       const logged = !!AUTH.user;
       authLabel.textContent = logged ? 'Wyloguj' : 'Zaloguj';
@@ -398,242 +428,158 @@
       }
     }
 
-    // ===== Realtime: Users (i budowa mapy do pełnych nazw) =====
-    function fullName(u){ return [u.first||'', u.last||''].filter(Boolean).join(' ').trim(); }
+    /* USERS realtime + render refresh */
+    const fullName = (u)=> [u.first||'', u.last||''].filter(Boolean).join(' ').trim();
+    function renderCodes(){
+      logBody.innerHTML='';
+      const arr = LAST_CODES.slice().reverse();
+      arr.forEach(item=>{
+        const u = USERS.get(item.designer);
+        const who = item.designerName || (u && fullName(u)) || item.designer;
+        const dt = (item.createdAt && typeof item.createdAt.toDate==='function') ? item.createdAt.toDate() :
+                   (typeof item.createdAt==='number'||typeof item.createdAt==='string') ? new Date(item.createdAt) : new Date();
+        const tr=document.createElement('tr');
+        tr.innerHTML = `<td><strong>${item.code}</strong></td>
+          <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
+          <td>${BRAND_MAP[item.brand]||item.brand}</td>
+          <td>${item.season}</td>
+          <td>${who}</td>
+          <td>${item.collection||''}</td>
+          <td>${dt.toLocaleString()}</td>`;
+        logBody.appendChild(tr);
+      });
+    }
     function subscribeUsers(){
       const qUsers = query(usersCol, orderBy('id'));
       onSnapshot(qUsers, snap=>{
         const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        USERS.clear();
-        arr.forEach(u=> USERS.set(u.id, u));
+        USERS.clear(); arr.forEach(u=> USERS.set(u.id, u));
         loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
-        // seed jeśli pusto
         if (arr.length === 0) {
           (async ()=>{
             const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
-            for (const u of seed) {
-              await setDoc(doc(db,'users',u), { id:u, first:u, last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
-            }
+            for (const u of seed) { await setDoc(doc(db,'users',u), { id:u, first:u, last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() }); }
             await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: serverTimestamp() });
           })().catch(console.error);
         }
-      }, err => console.error('users onSnapshot error', err));
+        renderCodes(); // << przerysuj kody z pełnymi nazwami
+      });
     }
 
-    // ===== Realtime: Codes (pokazuj pełne imię+nazwisko) =====
-    function toJsDate(ts){
-      if (!ts) return new Date();
-      if (typeof ts.toDate === 'function') return ts.toDate();
-      if (typeof ts === 'number') return new Date(ts);
-      if (typeof ts === 'string') return new Date(ts);
-      return new Date();
-    }
-    function designerDisplay(item){
-      if (item.designerName) return item.designerName;
-      const u = USERS.get(item.designer);
-      return u ? fullName(u) || item.designer : item.designer;
-    }
+    /* CODES realtime */
     function subscribeCodes(){
-      const qCodes = query(codesCol, orderBy('createdAt', 'asc'));
+      const qCodes = query(codesCol, orderBy('createdAt','asc'));
       onSnapshot(qCodes, snap=>{
-        const arr = snap.docs.map(d=> d.data());
-        logBody.innerHTML='';
-        arr.slice().reverse().forEach(item=>{
-          const tr=document.createElement('tr');
-          const dt = toJsDate(item.createdAt);
-          tr.innerHTML = `<td><strong>${item.code}</strong></td>
-            <td>${ASSORTMENT_MAP[item.assortment]||item.assortment}</td>
-            <td>${BRAND_MAP[item.brand]||item.brand}</td>
-            <td>${item.season}</td>
-            <td>${designerDisplay(item)}</td>
-            <td>${item.collection||''}</td>
-            <td>${dt.toLocaleString()}</td>`;
-          logBody.appendChild(tr);
-        });
-      }, err => console.error('codes onSnapshot error', err));
+        LAST_CODES = snap.docs.map(d=> d.data());
+        renderCodes();
+      });
     }
 
-    // ===== Sezony =====
+    /* Sezony / podgląd */
     function buildSeasons(){
-      const now = new Date();
-      const y = now.getFullYear();
-      const years=[y,y+1,y+2];
-      const opts=[];
+      const now = new Date(); const y = now.getFullYear(); const years=[y,y+1,y+2]; const opts=[];
       years.forEach(yr=>{ opts.push(`SS${yr}`); opts.push(`AW${yr}`); });
       seasonEl.innerHTML = opts.map(s=>`<option>${s}</option>`).join('');
-      const defaultSeason = (now.getMonth()>=8) ? `AW${y}` : `SS${y}`;
-      seasonEl.value = defaultSeason;
+      seasonEl.value = (now.getMonth()>=8) ? `AW${y}` : `SS${y}`;
     }
+    function computePreview(){ previewEl.textContent = `${assortmentEl.value}_${brandEl.value}…`; }
 
-    // ===== Podgląd kodu (orientacyjny) =====
-    async function computePreview(){
-      const a = assortmentEl.value; const b = brandEl.value;
-      previewEl.textContent = `${a}_${b}…`; // finalny numer nada transakcja
-    }
-
-    // ===== Transakcja licznika + zapis kodu (z designerName) =====
+    /* Create code (z designerName) */
     async function createCode(){
       if(!AUTH.user || AUTH.role!=='user'){ alert('Zaloguj się jako projektant/ka.'); return; }
       const a = assortmentEl.value; const b = brandEl.value; const s = seasonEl.value; const coll = (collectionEl.value||'').trim();
-
       const seq = await runTransaction(db, async (tx)=>{
         const snap = await tx.get(countersDoc);
-        const data = snap.exists() ? snap.data() : {};
-        const key = `${a}_${b}`;
-        const next = Number(data[key]||0) + 1;
+        const data = snap.exists()?snap.data():{};
+        const key = `${a}_${b}`; const next = Number(data[key]||0)+1;
         tx.set(countersDoc, Object.assign({}, data, { [key]: next }));
         return next;
       });
-
       const code = `${a}_${b}${pad3(seq)}`;
-      const u = USERS.get(AUTH.user) || {};
-      const entry = {
-        code, assortment:a, brand:b, season:s,
-        designer: AUTH.user,
-        designerName: fullName(u) || AUTH.user,   // << zapis pełnej nazwy
-        collection: coll,
-        createdAt: serverTimestamp()
-      };
+      const u = USERS.get(AUTH.user)||{};
+      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, designerName: fullName(u)||AUTH.user, collection:coll, createdAt: serverTimestamp() };
       await addDoc(codesCol, entry);
-
-      await computePreview();
-      showToast('Utworzono: '+code);
-      try{ await navigator.clipboard.writeText(code); }catch{}
+      computePreview(); showToast('Utworzono: '+code); try{ await navigator.clipboard.writeText(code); }catch{}
     }
 
-    // ===== FLOW: Signup (wymagane imię+nazwisko) =====
+    /* Signup (wymagane imię+nazwisko) */
     const validUsername = (u)=> /^[a-z][a-z0-9_.\-]{2,31}$/i.test(u);
-    newUserBtn.addEventListener('click', ()=>{
-      suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value='';
-      signupDialog.showModal(); suUser.focus();
-    });
-
+    newUserBtn.addEventListener('click', ()=>{ suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value=''; signupDialog.showModal(); suUser.focus(); });
     suNext.addEventListener('click', async ()=>{
-      const id = suUser.value.trim();
-      const first = suFirst.value.trim();
-      const last = suLast.value.trim();
-
-      if(!validUsername(id)){
-        suError.textContent='Użyj formatu nazwy: litera na start, 3–32 znaki (litery/cyfry . _ -)';
-        suError.style.display='block'; return;
-      }
-      if(first.length===0 || last.length===0){
-        suError.textContent='Imię i nazwisko są obowiązkowe.';
-        suError.style.display='block'; return;
-      }
+      const id = suUser.value.trim(), first = suFirst.value.trim(), last = suLast.value.trim();
+      if(!validUsername(id)){ suError.textContent='Użyj formatu: litera na start, 3–32 znaki (litery/cyfry . _ -)'; suError.style.display='block'; return; }
+      if(first.length===0 || last.length===0){ suError.textContent='Imię i nazwisko są obowiązkowe.'; suError.style.display='block'; return; }
       try{
-        const ref = doc(db, 'users', id);
-        const s = await getDoc(ref);
-        if (s.exists()) { suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; }
-        await setDoc(ref, { id, first, last, pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
-        signupDialog.close();
-        setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
-      } catch(e){
-        suError.textContent = 'Nie udało się utworzyć użytkownika.'; suError.style.display='block';
-      }
+        const ref = doc(db,'users',id); const s=await getDoc(ref);
+        if(s.exists()){ suError.textContent='Taki użytkownik już istnieje.'; suError.style.display='block'; return; }
+        await setDoc(ref,{ id, first, last, pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() });
+        signupDialog.close(); setPwdDialog.dataset.pendingUser=id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
+      }catch(e){ suError.textContent='Nie udało się utworzyć użytkownika.'; suError.style.display='block'; }
     });
 
-    // ===== FLOW: Login / Password =====
-    const AUTH_KEY_STORAGE = 'gh_auth_v1';
-    function setLoggedIn(u, role){ AUTH={user:u, role}; saveAuth(AUTH); updateAuthUI(); showToast('Zalogowano.'); }
-    function setLoggedOut(){ AUTH={user:'', role:''}; saveAuth(AUTH); updateAuthUI(); showToast('Wylogowano.'); }
+    /* Login / Password */
+    function setLoggedIn(u,role){ AUTH={user:u,role}; saveAuth(AUTH); updateAuthUI(); showToast('Zalogowano.'); }
+    function setLoggedOut(){ AUTH={user:'',role:''}; saveAuth(AUTH); updateAuthUI(); showToast('Wylogowano.'); }
 
-    authBtn.addEventListener('click', ()=>{
-      if(AUTH.user){ setLoggedOut(); return; }
-      loginError.style.display='none'; loginPassEl.value=''; loginDialog.showModal();
-    });
-
-    // „Anuluj” zamyka pop-upy
+    authBtn.addEventListener('click', ()=>{ if(AUTH.user){ setLoggedOut(); return; } loginError.style.display='none'; loginPassEl.value=''; loginDialog.showModal(); });
     document.querySelectorAll('dialog [data-close]').forEach(b=> b.addEventListener('click', e=> e.target.closest('dialog').close()));
 
     loginSubmit.addEventListener('click', async ()=>{
       const id = loginUserEl.value; const pass = loginPassEl.value;
-      if (id === 'administrator'){
-        if (pass === 'mars'){ loginDialog.close(); setLoggedIn(id,'admin'); }
+      if(id==='administrator'){ if(pass==='mars'){ loginDialog.close(); setLoggedIn(id,'admin'); } else { loginError.style.display='block'; } return; }
+      const s = await getDoc(doc(db,'users',id)); if(!s.exists()){ loginError.style.display='block'; return; }
+      const u = s.data();
+      if(u.forceReset){
+        if(pass==='Atlas123'){ loginDialog.close(); setPwdDialog.dataset.pendingUser=id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal(); }
         else { loginError.style.display='block'; }
         return;
       }
-      const s = await getDoc(doc(db,'users',id));
-      if(!s.exists()){ loginError.style.display='block'; return; }
-      const u = s.data();
-      if (u.forceReset){
-        if (pass === 'Atlas123'){
-          loginDialog.close();
-          setPwdDialog.dataset.pendingUser = id; newPwd.value=''; newPwd2.value=''; setPwdError.style.display='none'; setPwdDialog.showModal();
-        } else {
-          loginError.style.display='block';
-        }
-        return;
-      }
       const hash = await sha256Hex(pass);
-      if (u.pass === hash){
-        loginDialog.close(); setLoggedIn(id,'user');
-      } else {
-        loginError.style.display='block';
-      }
+      if(u.pass===hash){ loginDialog.close(); setLoggedIn(id,'user'); } else { loginError.style.display='block'; }
     });
 
     setPwdSave.addEventListener('click', async ()=>{
-      const u = setPwdDialog.dataset.pendingUser||'';
-      const p1 = newPwd.value; const p2 = newPwd2.value;
-      if (p1.length<8 || p1!==p2){ setPwdError.textContent='Hasła muszą być identyczne i mieć min. 8 znaków.'; setPwdError.style.display='block'; return; }
-      const hash = await sha256Hex(p1);
-      await updateDoc(doc(db,'users',u), { pass: hash, forceReset:false });
-      setPwdDialog.close();
-      setLoggedIn(u,'user');
+      const u = setPwdDialog.dataset.pendingUser||''; const p1=newPwd.value; const p2=newPwd2.value;
+      if(p1.length<8 || p1!==p2){ setPwdError.textContent='Hasła muszą być identyczne i mieć min. 8 znaków.'; setPwdError.style.display='block'; return; }
+      const hash = await sha256Hex(p1); await updateDoc(doc(db,'users',u), { pass:hash, forceReset:false }); setPwdDialog.close(); setLoggedIn(u,'user');
     });
 
-    // ===== ADMIN (reset hasła) =====
-    openAdmin.addEventListener('click', async ()=>{
-      const optionsHTML = Array.from(USERS.keys()).map(u=>`<span class="chip" data-u="${u}"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`).join('');
-      adminList.innerHTML = optionsHTML;
-      $('adminDialog').showModal();
+    /* Admin reset */
+    openAdmin.addEventListener('click', ()=>{
+      const html = Array.from(USERS.keys()).filter(u=>u!=='administrator').map(u=>`<span class="chip" data-u="${u}"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`).join('');
+      adminList.innerHTML = html; $('adminDialog').showModal();
     });
-
     adminList.addEventListener('click', async (e)=>{
-      const btn = e.target.closest('button[data-reset]');
-      if(!btn) return;
-      const who = btn.getAttribute('data-reset');
-      await updateDoc(doc(db,'users',who), { pass:'', forceReset:true });
-      showToast('Zresetowano hasło: '+who);
+      const btn = e.target.closest('button[data-reset]'); if(!btn) return;
+      await updateDoc(doc(db,'users',btn.getAttribute('data-reset')), { pass:'', forceReset:true }); showToast('Zresetowano hasło.');
     });
 
-    // ===== Sezony / Podgląd / Subskrypcje =====
+    /* Sezony / podgląd / subskrypcje */
     function buildSeasonsAndPreview(){
-      buildSeasons();
-      computePreview();
+      buildSeasons(); computePreview();
       brandEl.addEventListener('change', computePreview);
       assortmentEl.addEventListener('change', computePreview);
       refreshBtn.addEventListener('click', computePreview);
     }
-
-    // ===== Utwórz kod =====
     createBtn.addEventListener('click', createCode);
 
-    // ===== Eye toggles (jedna ikona, zmienia się) =====
+    /* Jedna ikona „oko” – logika przełączania */
     function toggleEye(btn, visible){
-      const svgClosed = btn.querySelector('svg[data-eye="closed"]');
-      const svgOpen = btn.querySelector('svg[data-eye="open"]');
-      if(!svgClosed || !svgOpen) return;
-      svgClosed.style.display = visible ? 'none' : '';
-      svgOpen.style.display   = visible ? '' : 'none';
+      const c=btn.querySelector('svg[data-eye="closed"]'), o=btn.querySelector('svg[data-eye="open"]');
+      if(c&&o){ c.style.display = visible?'none':''; o.style.display = visible?'':'none'; }
     }
     document.addEventListener('click', (e)=>{
       const btn = e.target.closest('.pw-toggle'); if(!btn) return;
-      const id = btn.getAttribute('data-target'); const inp = document.getElementById(id);
-      if(!inp) return;
-      const nowVisible = (inp.type === 'password');
-      inp.type = nowVisible ? 'text' : 'password';
-      toggleEye(btn, nowVisible);
+      const id = btn.getAttribute('data-target'); const inp = document.getElementById(id); if(!inp) return;
+      const nowVisible = (inp.type==='password'); inp.type = nowVisible?'text':'password'; toggleEye(btn, nowVisible);
     });
 
-    // ===== Init =====
+    /* Init */
     (function init(){
       buildSeasonsAndPreview();
-      subscribeUsers();
-      subscribeCodes();
+      subscribeUsers();     // najpierw users
+      subscribeCodes();     // potem codes
       updateAuthUI();
-      // nie pokazujemy auto-logowania; stan trzymany w localStorage
     })();
   </script>
 </body>
