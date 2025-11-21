@@ -343,14 +343,19 @@
 
   <dialog id="adminDialog">
     <div class="modal-header"><h3 class="modal-title">Panel administratora</h3></div>
-    <div class="modal-body"><p class="hint">Zresetuj hasło użytkownika (ustawi puste hasło i wymusi zmianę przy następnym logowaniu).</p><div id="adminList" class="chips" style="margin-top:8px"></div></div>
-    <div class="modal-actions"><button class="btn" type="button" data-close>Zamknij</button></div>
+    <div class="modal-body">
+      <p class="hint">Zresetuj hasło użytkownika (ustawi puste hasło i wymusi zmianę przy następnym logowaniu).</p>
+      <div id="adminList" class="chips" style="margin-top:8px"></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" type="button" data-close>Zamknij</button>
+    </div>
   </dialog>
 
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import {
-      getFirestore, doc, getDoc, setDoc, updateDoc,
+      getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc,
       collection, addDoc, query, orderBy, onSnapshot, runTransaction,
       serverTimestamp
     } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
@@ -412,6 +417,79 @@
 
     const USERS = new Map();   // id -> user data
     let LAST_CODES = [];       // ostatnie pobrane dokumenty 'codes'
+    let DID_CLEAR_TEST_USERS = false; // jednorazowe czyszczenie wszystkich projektantów
+
+    // Startowe wartości dla BLOOVII / ESOTIQ / HENDERSON / HENDERSON LADIES
+    // (ostatnio użyte numery – generator zaczyna od +1, żeby pierwszy nowy kod był tym podanym)
+    const INITIAL_START = {
+      /* BLOOVII (BV) */
+      'PR_BV': 164,  // → PR_BV165
+      'PT_BV': 83,   // → PT_BV084
+      'EM_BV': 41,   // → EM_BV042
+      'RB_BV': 19,   // RUB_BV020 → RB_BV020
+      'TP_BV': 1,    // → TP_BV002
+      'AP_BV': 9,    // → AP_BV010
+      'LB_BV': 54,   // → LB_BV055
+      'HG_BV': 13,   // → HG_BV014
+      'ST_BV': 1,    // → ST_BV002
+      'PC_BV': 2,    // → PC_BV003
+      'BX_BV': 5,    // → BX_BV006
+      'FAN_BV':7,    // → FAN_BV008
+      'BT_BV': 1,    // → BT_BV002
+      'HAN_BV':1,    // → HAN_BV002
+      'WCL_BV':2,    // → WCL_BV003
+
+      /* ESOTIQ (ES) */
+      'PR_ES': 471,  // PR_ES472
+      'PT_ES': 840,  // PT_ES841
+      'EM_ES': 132,  // EM_ES133
+      'RB_ES': 186,  // RUB_ES187 → RB_ES187
+      'TP_ES': 12,   // TP_ES013
+      'AP_ES': 142,  // AP_ES143
+      'LB_ES': 149,  // LB_ES150
+      'HG_ES': 157,  // HG_ES158
+      'ST_ES': 64,   // ST_ES065
+      'PC_ES': 0,    // PC_ES001
+      'BX_ES': 233,  // BX_ES234
+      'FAN_ES':95,   // FAN_ES096
+      'BT_ES': 4,    // BT_ES005 (BT-ES005)
+      'HAN_ES':0,    // HAN_ES001
+      'WCL_ES':0,    // WCL_ES001
+
+      /* HENDERSON (HE) */
+      'PR_HE': 761,  // PR_HE762
+      'PT_HE': 906,  // PT_HE907
+      'EM_HE': 101,  // EM_HE102 (EM-HE102)
+      'RB_HE': 653,  // RUB_HE654 → RB_HE654
+      'TP_HE': 19,   // TP_HE020
+      'AP_HE': 1,    // AP_HE002
+      'LB_HE': 505,  // LB_HE506
+      'HG_HE': 57,   // HG_HE058
+      'PC_HE': 0,    // PC_HE001
+      'ST_HE': 160,  // ST_HE161
+      'BX_HE': 270,  // BX_HE271
+      'FAN_HE':16,   // FAN_HE017
+      'BT_HE': 0,    // BT_HE001
+      'HAN_HE':0,    // HAN_HE001
+      'WCL_HE':24,   // WCL_HE025
+
+      /* HENDERSON LADIES (HL) */
+      'PR_HL': 435,  // PR_HL436
+      'PT_HL': 443,  // PT_HL444
+      'EM_HL': 19,   // EM_HL020
+      'RB_HL': 19,   // RUB_HL020 → RB_HL020
+      'TP_HL': 0,    // TP_HL001
+      'AP_HL': 18,   // AP_HL019
+      'LB_HL': 44,   // LB_HL045
+      'HG_HL': 10,   // HG_HL011
+      'ST_HL': 13,   // traktujemy ST_HL014 jako next → start=13
+      'PC_HL': 0,    // PC_HL001
+      'BX_HL': 44,   // BX_HL045
+      'FAN_HL':0,    // FAN_HL001
+      'BT_HL': 1,    // BT_HL002
+      'HAN_HL':0,    // HAN_HL001
+      'WCL_HL':0     // WCL_HL001
+    };
 
     /* AUTH UI */
     function updateAuthUI(){
@@ -419,17 +497,25 @@
       authLabel.textContent = logged ? 'Wyloguj' : 'Zaloguj';
       openAdmin.style.display = AUTH.role==='admin' ? 'inline-flex' : 'none';
       if (designerEl){
-        designerEl.innerHTML = logged && AUTH.role==='user' ? `<option>${AUTH.user}</option>` : '<option value="">— niezalogowano —</option>';
+        designerEl.innerHTML = logged && AUTH.role==='user'
+          ? `<option>${AUTH.user}</option>`
+          : '<option value="">— niezalogowano —</option>';
         designerEl.disabled = true;
       }
       if (loggedBadge){
-        if (logged) { loggedBadge.style.display='inline-flex'; loggedBadge.textContent = `Zalogowany: ${AUTH.user}${AUTH.role==='admin'?' (admin)':''}`; }
-        else { loggedBadge.style.display='none'; loggedBadge.textContent=''; }
+        if (logged) {
+          loggedBadge.style.display='inline-flex';
+          loggedBadge.textContent = `Zalogowany: ${AUTH.user}${AUTH.role==='admin'?' (admin)':''}`;
+        } else {
+          loggedBadge.style.display='none';
+          loggedBadge.textContent='';
+        }
       }
     }
 
-    /* USERS realtime + render refresh */
+    /* USERS realtime + JEDNORAZOWE CZYSZCZENIE + ponowne renderowanie */
     const fullName = (u)=> [u.first||'', u.last||''].filter(Boolean).join(' ').trim();
+
     function renderCodes(){
       logBody.innerHTML='';
       const arr = LAST_CODES.slice().reverse();
@@ -449,20 +535,40 @@
         logBody.appendChild(tr);
       });
     }
+
     function subscribeUsers(){
       const qUsers = query(usersCol, orderBy('id'));
-      onSnapshot(qUsers, snap=>{
+      onSnapshot(qUsers, async snap=>{
         const arr = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        USERS.clear(); arr.forEach(u=> USERS.set(u.id, u));
-        loginUserEl.innerHTML = arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') + '<option value="administrator">administrator</option>';
-        if (arr.length === 0) {
-          (async ()=>{
-            const seed = ['Ania','Grzegorz','Kuba','Łukasz','Olga','Rafał'];
-            for (const u of seed) { await setDoc(doc(db,'users',u), { id:u, first:u, last:'', pass:'', forceReset:true, role:'user', createdAt: serverTimestamp() }); }
-            await setDoc(doc(db,'users','administrator'), { id:'administrator', first:'Admin', last:'Root', pass:'', forceReset:false, role:'admin', createdAt: serverTimestamp() });
-          })().catch(console.error);
+
+        // JEDNORAZOWE "WYCZYSZCZENIE" LISTY PROJEKTANTÓW:
+        if (!DID_CLEAR_TEST_USERS && arr.length > 0) {
+          DID_CLEAR_TEST_USERS = true;
+          const toDelete = arr.filter(u => u.id !== 'administrator');
+          if (toDelete.length > 0) {
+            try {
+              await Promise.all(
+                toDelete.map(u => deleteDoc(doc(db, 'users', u.id)))
+              );
+            } catch(e) {
+              console.error('Błąd przy kasowaniu starych użytkowników', e);
+            }
+            return; // poczekaj na kolejny snapshot po usunięciu
+          }
         }
-        renderCodes(); // << przerysuj kody z pełnymi nazwami
+
+        USERS.clear();
+        arr.forEach(u=> USERS.set(u.id, u));
+
+        if (arr.length === 0) {
+          loginUserEl.innerHTML = `<option value="administrator">administrator</option>`;
+        } else {
+          loginUserEl.innerHTML =
+            arr.map(u=>`<option value="${u.id}">${u.id}</option>`).join('') +
+            '<option value="administrator">administrator</option>';
+        }
+
+        renderCodes();
       });
     }
 
@@ -484,27 +590,47 @@
     }
     function computePreview(){ previewEl.textContent = `${assortmentEl.value}_${brandEl.value}…`; }
 
-    /* Create code (z designerName) */
+    /* Create code (z designerName + start dla wszystkich marek) */
     async function createCode(){
       if(!AUTH.user || AUTH.role!=='user'){ alert('Zaloguj się jako projektant/ka.'); return; }
       const a = assortmentEl.value; const b = brandEl.value; const s = seasonEl.value; const coll = (collectionEl.value||'').trim();
+      const key = `${a}_${b}`;
+
       const seq = await runTransaction(db, async (tx)=>{
         const snap = await tx.get(countersDoc);
         const data = snap.exists()?snap.data():{};
-        const key = `${a}_${b}`; const next = Number(data[key]||0)+1;
+        let current = data[key];
+        if (current == null) {
+          current = INITIAL_START[key] ?? 0;
+        }
+        const next = Number(current) + 1;
         tx.set(countersDoc, Object.assign({}, data, { [key]: next }));
         return next;
       });
+
       const code = `${a}_${b}${pad3(seq)}`;
       const u = USERS.get(AUTH.user)||{};
-      const entry = { code, assortment:a, brand:b, season:s, designer:AUTH.user, designerName: fullName(u)||AUTH.user, collection:coll, createdAt: serverTimestamp() };
+      const entry = {
+        code,
+        assortment:a,
+        brand:b,
+        season:s,
+        designer:AUTH.user,
+        designerName: fullName(u)||AUTH.user,
+        collection:coll,
+        createdAt: serverTimestamp()
+      };
       await addDoc(codesCol, entry);
-      computePreview(); showToast('Utworzono: '+code); try{ await navigator.clipboard.writeText(code); }catch{}
+      computePreview(); showToast('Utworzono: '+code);
+      try{ await navigator.clipboard.writeText(code); }catch{}
     }
 
-    /* Signup (wymagane imię+nazwisko) */
+    /* Signup */
     const validUsername = (u)=> /^[a-z][a-z0-9_.\-]{2,31}$/i.test(u);
-    newUserBtn.addEventListener('click', ()=>{ suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value=''; signupDialog.showModal(); suUser.focus(); });
+    newUserBtn.addEventListener('click', ()=>{
+      suError.style.display='none'; suUser.value=''; suFirst.value=''; suLast.value='';
+      signupDialog.showModal(); suUser.focus();
+    });
     suNext.addEventListener('click', async ()=>{
       const id = suUser.value.trim(), first = suFirst.value.trim(), last = suLast.value.trim();
       if(!validUsername(id)){ suError.textContent='Użyj formatu: litera na start, 3–32 znaki (litery/cyfry . _ -)'; suError.style.display='block'; return; }
@@ -526,7 +652,10 @@
 
     loginSubmit.addEventListener('click', async ()=>{
       const id = loginUserEl.value; const pass = loginPassEl.value;
-      if(id==='administrator'){ if(pass==='mars'){ loginDialog.close(); setLoggedIn(id,'admin'); } else { loginError.style.display='block'; } return; }
+      if(id==='administrator'){
+        if(pass==='mars'){ loginDialog.close(); setLoggedIn(id,'admin'); } else { loginError.style.display='block'; }
+        return;
+      }
       const s = await getDoc(doc(db,'users',id)); if(!s.exists()){ loginError.style.display='block'; return; }
       const u = s.data();
       if(u.forceReset){
@@ -546,7 +675,10 @@
 
     /* Admin reset */
     openAdmin.addEventListener('click', ()=>{
-      const html = Array.from(USERS.keys()).filter(u=>u!=='administrator').map(u=>`<span class="chip" data-u="${u}"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`).join('');
+      const html = Array.from(USERS.keys())
+        .filter(u=>u!=='administrator')
+        .map(u=>`<span class="chip" data-u="${u}"><strong>${u}</strong> <button class="btn" data-reset="${u}">Reset</button></span>`)
+        .join('');
       adminList.innerHTML = html; $('adminDialog').showModal();
     });
     adminList.addEventListener('click', async (e)=>{
@@ -577,8 +709,8 @@
     /* Init */
     (function init(){
       buildSeasonsAndPreview();
-      subscribeUsers();     // najpierw users
-      subscribeCodes();     // potem codes
+      subscribeUsers();     // czyta użytkowników + jednorazowo czyści testowych
+      subscribeCodes();     // czyta kody
       updateAuthUI();
     })();
   </script>
